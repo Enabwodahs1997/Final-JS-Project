@@ -38,7 +38,7 @@
 
 .form-group label {
   font-weight: 600;
-  color: var(--text-primary);
+  color: var(--secondary-dark);
   font-size: 0.95rem;
 }
 
@@ -143,6 +143,6 @@
   }
 
   .form-group label {
-    color: var(--neutral-100);
+    color: var(--secondary-light);
   }
 }
