@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Transaction History</title>
+  <link rel="stylesheet" href="../index.css">
+  <link rel="stylesheet" href="./history.css">
+</head>
+<body>
+  <div id="app">
+    <div class="history-container">
+      <div class="history-header">
+        <h1>Transaction History</h1>
+        <a href="../index.html" class="btn btn-secondary">Back to Dashboard</a>
+      </div>
+
+      <div class="history-controls">
+        <div class="filter-group">
+          <label for="filterType">Filter by Type:</label>
+          <select id="filterType">
+            <option value="">All Transactions</option>
+            <option value="income">Income</option>
+            <option value="expense">Expense</option>
+          </select>
+        </div>
+        <button id="clearHistoryBtn" class="btn btn-danger">Clear All History</button>
+      </div>
+
+      <div id="transactionsList" class="transactions-list">
+        <p class="no-transactions">No transactions yet</p>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="./history.js"></script>
+</body>
+</html>

@@ -3,11 +3,35 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Final JS Project</title>
+  <title>Dashboard/Homepage</title>
   <link rel="stylesheet" href="./index.css">
 </head>
 <body>
-  <div id="app"></div>
+  <div id="app">
+    <h1>Finance Dashboard</h1>
+    
+    <div class="financial-overview">
+      <div class="card">
+        <h2>Total Income</h2>
+        <p id="totalIncome" class="amount">$0.00</p>
+      </div>
+      
+      <div class="card">
+        <h2>Total Expenses</h2>
+        <p id="totalExpenses" class="amount">$0.00</p>
+      </div>
+      
+      <div class="card">
+        <h2>Remaining Balance</h2>
+        <p id="remainingBalance" class="amount">$0.00</p>
+      </div>
+    </div>
+    
+    <div class="actions">
+      <button id="addTransactionBtn" class="btn btn-primary">Add Transaction</button>
+      <button id="transactionHistoryBtn" class="btn btn-secondary">Transaction History</button>
+    </div>
+  </div>
   <script type="module" src="./index.js"></script>
 </body>
 </html>

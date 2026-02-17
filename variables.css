@@ -135,6 +135,15 @@ p, a {
   background-color: var(--secondary-dark);
 }
 
+.btn-danger {
+  background-color: var(--danger-color);
+  color: white;
+}
+
+.btn-danger:hover {
+  background-color: #DC2626;
+}
+
 .card {
   background-color: var(--bg-primary);
   border-radius: var(--radius-lg);

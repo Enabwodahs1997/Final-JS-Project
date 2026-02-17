@@ -100,21 +100,7 @@ function handleAddTransaction() {
 
 // Handle viewing transaction history
 function handleViewHistory() {
-  const transactions = getTransactions();
-  
-  if (transactions.length === 0) {
-    alert('No transactions yet. Add one to get started!');
-    return;
-  }
-  
-  let historyText = 'Transaction History:\n\n';
-  transactions.forEach(transaction => {
-    const date = new Date(transaction.date).toLocaleDateString();
-    const sign = transaction.type === 'income' ? '+' : '-';
-    historyText += `${date} | ${transaction.description} | ${sign}$${transaction.amount.toFixed(2)}\n`;
-  });
-  
-  alert(historyText);
+  window.location.href = './history/history.html';
 }
 
 // Export functions for testing/external use
