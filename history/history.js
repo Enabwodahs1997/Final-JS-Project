@@ -1,9 +1,20 @@
 const STORAGE_KEY = 'financeTransactions';
 
-document.addEventListener('DOMContentLoaded', () => {
-  loadAndDisplayTransactions();
+function delay(ms) {
+  // Returns a Promise that waits for 'ms' milliseconds before continuing
+  return new Promise(function(resolve) {
+    // setTimeout calls resolve after the delay is done
+    setTimeout(function() {
+      resolve();
+    }, ms);
+  });
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+  await loadAndDisplayTransactions();
   setupFilterListener();
   setupClearButton();
+  setupDeleteListeners();
 });
 
 function getTransactions() {
@@ -11,12 +22,12 @@ function getTransactions() {
   return data ? JSON.parse(data) : [];
 }
 
-function loadAndDisplayTransactions() {
+async function loadAndDisplayTransactions() {
   const transactions = getTransactions();
-  displayTransactions(transactions);
+  await displayTransactions(transactions);
 }
 
-function displayTransactions(transactions) {
+async function displayTransactions(transactions) {
   const container = document.getElementById('transactionsList');
 
   if (transactions.length === 0) {
@@ -53,30 +64,30 @@ function createTransactionCard(transaction) {
 
 function setupFilterListener() {
   const filterSelect = document.getElementById('filterType');
-  filterSelect.addEventListener('change', handleFilter);
+  filterSelect.addEventListener('change', async () => await handleFilter());
 }
 
-function handleFilter() {
+async function handleFilter() {
   const filterSelect = document.getElementById('filterType');
   const filterValue = filterSelect.value;
   const allTransactions = getTransactions();
 
   const filtered = filterValue ? allTransactions.filter(t => t.type === filterValue) : allTransactions;
-  displayTransactions(filtered);
+  await displayTransactions(filtered);
   setupDeleteListeners();
 }
 
 function setupClearButton() {
   const clearBtn = document.getElementById('clearHistoryBtn');
-  clearBtn.addEventListener('click', handleClearHistory);
+  clearBtn.addEventListener('click', async () => await handleClearHistory());
 }
 
-function handleClearHistory() {
+async function handleClearHistory() {
   const confirm = window.confirm('Are you sure you want to clear all transaction history? This cannot be undone.');
 
   if (confirm) {
     localStorage.removeItem(STORAGE_KEY);
-    loadAndDisplayTransactions();
+    await loadAndDisplayTransactions();
   }
 }
 
@@ -86,11 +97,11 @@ document.addEventListener('click', (e) => {
   }
 });
 
-function handleDeleteTransaction(transactionId) {
+async function handleDeleteTransaction(transactionId) {
   const transactions = getTransactions();
   const filtered = transactions.filter(t => t.id !== parseInt(transactionId));
   localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
-  loadAndDisplayTransactions();
+  await loadAndDisplayTransactions();
   setupDeleteListeners();
 }
 
@@ -102,7 +113,5 @@ function setupDeleteListeners() {
     });
   });
 }
-
-document.addEventListener('DOMContentLoaded', setupDeleteListeners);
 
 export { getTransactions };

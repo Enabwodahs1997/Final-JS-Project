@@ -51,7 +51,7 @@ npm install
 npm run dev
 ```
 
-The app will open automatically in your browser at `http://localhost:5173`
+The app will open automatically in your browser at `http://localhost:`
 
 ### Project Structure
 

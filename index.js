@@ -1,48 +1,51 @@
-// Transaction storage key
 const STORAGE_KEY = 'financeTransactions';
 
-// Initialize the app
-document.addEventListener('DOMContentLoaded', () => {
-  loadAndDisplayData();
+function delay(ms) {
+  // Returns a Promise that waits for 'ms' milliseconds before continuing
+  return new Promise(function(resolve) {
+    // setTimeout calls resolve after the delay is done
+    setTimeout(function() {
+      resolve();
+    }, ms);
+  });
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+  await loadAndDisplayData();
   setupEventListeners();
 });
 
-// Load transactions from localStorage and display financial overview
-function loadAndDisplayData() {
-  const transactions = getTransactions();
-  updateFinancialOverview(transactions);
+async function loadAndDisplayData() {
+  const transactions = await getTransactions();
+  await updateFinancialOverview(transactions);
 }
 
-// Get all transactions from localStorage
-function getTransactions() {
+async function getTransactions() {
   const data = localStorage.getItem(STORAGE_KEY);
   return data ? JSON.parse(data) : [];
 }
 
-// Save transactions to localStorage
-function saveTransactions(transactions) {
+async function saveTransactions(transactions) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(transactions));
 }
 
-// Add a new transaction
-function addTransaction(description, amount, type) {
-  const transactions = getTransactions();
+async function addTransaction(description, amount, type) {
+  const transactions = await getTransactions();
   const transaction = {
     id: Date.now(),
     description,
     amount: parseFloat(amount),
-    type, // 'income' or 'expense'
+    type,
     date: new Date().toISOString(),
   };
   
   transactions.push(transaction);
-  saveTransactions(transactions);
-  loadAndDisplayData();
+  await saveTransactions(transactions);
+  await loadAndDisplayData();
   
   return transaction;
 }
 
-// Calculate totals
 function calculateTotals(transactions) {
   let totalIncome = 0;
   let totalExpenses = 0;
@@ -62,15 +65,13 @@ function calculateTotals(transactions) {
   };
 }
 
-// Update financial overview display
-function updateFinancialOverview(transactions) {
+async function updateFinancialOverview(transactions) {
   const { totalIncome, totalExpenses, remainingBalance } = calculateTotals(transactions);
   
   document.getElementById('totalIncome').textContent = `$${totalIncome.toFixed(2)}`;
   document.getElementById('totalExpenses').textContent = `$${totalExpenses.toFixed(2)}`;
   document.getElementById('remainingBalance').textContent = `$${remainingBalance.toFixed(2)}`;
   
-  // Color code the balance
   const balanceElement = document.getElementById('remainingBalance');
   if (remainingBalance >= 0) {
     balanceElement.style.color = '#28a745';
@@ -93,15 +94,12 @@ function setupEventListeners() {
   }
 }
 
-// Handle adding a transaction (navigate to transaction page)
 function handleAddTransaction() {
   window.location.href = './transactionPage/transaction.html';
 }
 
-// Handle viewing transaction history
 function handleViewHistory() {
   window.location.href = './history/history.html';
 }
 
-// Export functions for testing/external use
 export { addTransaction, getTransactions, calculateTotals };

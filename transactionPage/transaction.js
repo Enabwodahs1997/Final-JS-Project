@@ -2,24 +2,33 @@ import { categories } from './objects.js';
 
 const STORAGE_KEY = 'financeTransactions';
 
+function delay(ms) {
+  // Returns a Promise that waits for 'ms' milliseconds before continuing
+  return new Promise(function(resolve) {
+    // setTimeout calls resolve after the delay is done
+    setTimeout(function() {
+      resolve();
+    }, ms);
+  });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   initializeDateField();
   setupCategoryDropdown();
   setupFormSubmit();
   setupTypeChange();
-}); // This is all the DOM content so it will listen for the form submit and type change events after the page has loaded
+});
 
 function initializeDateField() {
   const dateInput = document.getElementById('date');
   const today = new Date().toISOString().split('T')[0];
   dateInput.value = today;
-} // This function initializes the date field to the current date when the page loads, making it easier for users to enter transactions for the current day.
+}
 
 function setupTypeChange() {
   const typeSelect = document.getElementById('transactionType');
   typeSelect.addEventListener('change', updateCategories);
-} // This function sets up an event listener for changes to the transaction type dropdown. When the user selects a different type (income or expense), it calls the updateCategories function to refresh the category options based on the selected type.
-// The updateCategories function dynamically updates the category dropdown options based on the selected transaction type. 
+} 
 function updateCategories() {
   const typeSelect = document.getElementById('transactionType');
   const categorySelect = document.getElementById('category');
@@ -41,14 +50,14 @@ function updateCategories() {
 
 function setupCategoryDropdown() {
   updateCategories();
-} // This function initializes the category dropdown when the page loads by calling updateCategories.
+}
 
 function setupFormSubmit() {
   const form = document.getElementById('transactionForm');
-  form.addEventListener('submit', handleFormSubmit);
-} // This function sets up an event listener for the form submission. 
+  form.addEventListener('submit', async (e) => await handleFormSubmit(e));
+} 
 
-function handleFormSubmit(e) {
+async function handleFormSubmit(e) {
   e.preventDefault();
 
   const formData = {
@@ -62,22 +71,22 @@ function handleFormSubmit(e) {
   if (!validateFormData(formData)) {
     alert('Please fill in all required fields');
     return;
-  } //Loads the form data into an object and validates it. If the validation fails, it shows an alert to the user.
+  }
 
   const transaction = {
     id: Date.now(),
     description: `${formData.category} - ${formData.notes || 'No notes'}`,
     amount: formData.amount,
     type: formData.transactionType,
-    date: new Date(formData.date).toISOString(), //logic that has to do with the date field to make it work. Date isn't stored as a string, but as an ISO string to make it easier to sort and display later on. (don't ask me why the date stuff is dumb).
+    date: new Date(formData.date).toISOString(),
     category: formData.category,
     notes: formData.notes
   };
 
-  addTransactionToStorage(transaction);
-  showSuccessMessage();
+  await addTransactionToStorage(transaction);
+  await showSuccessMessage();
   resetForm();
-}//runs these functions after a transaction is successfully added to storage: shows a success message and resets the form for the next entry.
+}
 
 function validateFormData(data) {
   return (
@@ -88,24 +97,22 @@ function validateFormData(data) {
   );
 }
 
-function addTransactionToStorage(transaction) {
+async function addTransactionToStorage(transaction) {
   const transactions = getTransactions();
   transactions.push(transaction);
   localStorage.setItem(STORAGE_KEY, JSON.stringify(transactions));
-} //local storage so it doesn't get lost when refreshing the page. 
+} 
 
 function getTransactions() {
   const data = localStorage.getItem(STORAGE_KEY);
   return data ? JSON.parse(data) : [];
 }
 
-function showSuccessMessage() {
+async function showSuccessMessage() {
   const message = document.getElementById('successMessage');
   message.style.display = 'block';
-
-  setTimeout(() => {
-    message.style.display = 'none';
-  }, 3000);
+  await delay(3000);
+  message.style.display = 'none';
 }
 
 function resetForm() {
