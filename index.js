@@ -44,7 +44,7 @@ async function addTransaction(description, amount, type) {
     description,
     amount: parseFloat(amount),
     type,
-    date: new Date().toISOString(),
+    date: new Date().toISOString(), //date code is easier to just copy and paste from the internet because it can be a hard thing to run through all the rules someone before has already done and figured out.
   };
   // Save the transaction to local storage and provide feedback to the user
   transactions.push(transaction);
