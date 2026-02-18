@@ -1,4 +1,7 @@
+import axios from 'axios';
+
 const STORAGE_KEY = 'financeTransactions';
+const API_URL = 'http://localhost:3001/api/transactions';
 
 function delay(ms) {
   // Returns a Promise that waits for 'ms' milliseconds before continuing
@@ -17,14 +20,22 @@ document.addEventListener('DOMContentLoaded', async () => {
   setupClearButton();
   setupDeleteListeners();
 });
-//this pulles transactions from local storage and returns them as an array of objects.
-function getTransactions() {
-  const data = localStorage.getItem(STORAGE_KEY);
-  return data ? JSON.parse(data) : []; //this will return an empty array if there are no transactions stored.
+//this pulles transactions from the backend API or falls back to local storage.
+async function getTransactions() {
+  try {
+    // Try to fetch transactions from the backend API using axios
+    const response = await axios.get(API_URL);
+    return response.data;
+  } catch (error) {
+    // If the API call fails, fall back to localStorage
+    console.warn('API unavailable, using localStorage:', error.message);
+    const data = localStorage.getItem(STORAGE_KEY);
+    return data ? JSON.parse(data) : []; //this will return an empty array if there are no transactions stored.
+  }
 }
 //this is to load transactions and display them on the page.
 async function loadAndDisplayTransactions() {
-  const transactions = getTransactions();
+  const transactions = await getTransactions();
   await displayTransactions(transactions);
 }
 //this function takes the array of transactions and creates HTML for each. 
@@ -71,7 +82,7 @@ function setupFilterListener() {
 async function handleFilter() {
   const filterSelect = document.getElementById('filterType');
   const filterValue = filterSelect.value;
-  const allTransactions = getTransactions();
+  const allTransactions = await getTransactions();
 //above sets the logic and the below runs the logic to filter the transactions and display them. If the filter is set to 'all', it will show all transactions, otherwise it will filter by the selected type.
   const filtered = filterValue ? allTransactions.filter(t => t.type === filterValue) : allTransactions;
   await displayTransactions(filtered);
@@ -82,12 +93,20 @@ function setupClearButton() {
   const clearBtn = document.getElementById('clearHistoryBtn');
   clearBtn.addEventListener('click', async () => await handleClearHistory());
 }
-//this function prompts the user for confirmation before clearing all transaction history from local storage and then updates the displayed transactions.
+//this function prompts the user for confirmation before clearing all transaction history and then deletes it via API or falls back to localStorage.
 async function handleClearHistory() {
   const confirm = window.confirm('Are you sure you want to clear all transaction history? This cannot be undone.');
-//if the user confirms, it will remove the transactions from local storage and reload the displayed transactions, which will show the message that there are no transactions.
+//if the user confirms, it will remove the transactions and reload the displayed transactions, which will show the message that there are no transactions.
   if (confirm) {
-    localStorage.removeItem(STORAGE_KEY);
+    try {
+      // Try to clear transactions via API using axios
+      await axios.delete(API_URL);
+      console.log('All transactions cleared from API');
+    } catch (error) {
+      // If the API call fails, fall back to removing from localStorage
+      console.warn('API unavailable, clearing localStorage:', error.message);
+      localStorage.removeItem(STORAGE_KEY);
+    }
     await loadAndDisplayTransactions();
   }
 }
@@ -97,11 +116,19 @@ document.addEventListener('click', (e) => {
     handleDeleteTransaction(e.target.dataset.id);
   }
 });
-//this function deletes a specific transaction by its ID, it filters out the transaction from the list and updates local storage, then reloads the displayed transactions.
+//this function deletes a specific transaction by its ID via the API or falls back to localStorage, then reloads the displayed transactions.
 async function handleDeleteTransaction(transactionId) {
-  const transactions = getTransactions();
-  const filtered = transactions.filter(t => t.id !== parseInt(transactionId));
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
+  try {
+    // Try to delete transaction from the backend API using axios
+    await axios.delete(`${API_URL}/${transactionId}`);
+    console.log('Transaction deleted from API');
+  } catch (error) {
+    // If the API call fails, fall back to deleting from localStorage
+    console.warn('API unavailable, deleting from localStorage:', error.message);
+    const transactions = getTransactions();
+    const filtered = transactions.filter(t => t.id !== parseInt(transactionId));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
+  }
   await loadAndDisplayTransactions();
   setupDeleteListeners();
 }

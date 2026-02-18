@@ -6,7 +6,10 @@
 // and updating the financial overview. Event listeners are set up to respond to user interactions, 
 // making the application interactive and user-friendly.
 
+import axios from 'axios';
+
 const STORAGE_KEY = 'financeTransactions';
+const API_URL = 'http://localhost:3001/api/transactions'; // Backend API endpoint for transactions
 
 function delay(ms) {
   // Returns a Promise that waits for 'ms' milliseconds before continuing
@@ -29,14 +32,29 @@ async function loadAndDisplayData() {
 }
 // The loadAndDisplayData function is responsible for fetching the transaction data from local storage and updating the financial overview section of the page. It calls the getTransactions function to retrieve the stored transactions and then passes that data to the updateFinancialOverview function, which calculates totals and updates the display accordingly. This function is called when the DOM content is loaded to ensure that the user sees their current financial status as soon as they access the page.
 async function getTransactions() {
-  const data = localStorage.getItem(STORAGE_KEY);
-  return data ? JSON.parse(data) : [];
+  try {
+    // Try to fetch transactions from the backend API using axios
+    const response = await axios.get(API_URL);
+    return response.data;
+  } catch (error) {
+    // If the API call fails, fall back to localStorage
+    console.warn('API unavailable, using localStorage:', error.message);
+    const data = localStorage.getItem(STORAGE_KEY);
+    return data ? JSON.parse(data) : [];
+  }
 }
-// The getTransactions function retrieves the transaction data from local storage. If there is data stored under the specified key, it parses the JSON string into an array of transaction objects and returns it. If there is no data (i.e., the user has not logged any transactions yet), it returns an empty array. This function is essential for accessing the stored transactions when displaying them in the transaction history or performing calculations based on the transaction data.
+// The getTransactions function attempts to retrieve transactions from a backend API using axios. If the API is unavailable or returns an error, it gracefully falls back to storing and retrieving data from local storage. This dual approach ensures that the application remains functional even if the backend is temporarily down.
 async function saveTransactions(transactions) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(transactions));
+  try {
+    // Try to save transactions to the backend API using axios
+    await axios.post(API_URL, { transactions });
+  } catch (error) {
+    // If the API call fails, fall back to saving in localStorage
+    console.warn('API unavailable, saving to localStorage:', error.message);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(transactions));
+  }
 }
-// The saveTransactions function takes an array of transaction objects and saves it to local storage under the specified key. It converts the array into a JSON string before storing it, allowing for easy retrieval and parsing later. This function is used whenever a new transaction is added or when transactions are updated, ensuring that the data in local storage remains current and accurate.
+// The saveTransactions function attempts to save transactions to a backend API using axios with a POST request. If the API is unavailable or returns an error, it falls back to storing the data in local storage. This ensures data persistence regardless of API availability.
 async function addTransaction(description, amount, type) {
   const transactions = await getTransactions();
   const transaction = {

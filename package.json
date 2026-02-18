@@ -21,6 +21,9 @@
     "url": "https://github.com/Enabwodahs1997/Final-JS-Project/issues"
   },
   "homepage": "https://github.com/Enabwodahs1997/Final-JS-Project#readme",
+  "dependencies": {
+    "axios": "^1.6.0"
+  },
   "devDependencies": {
     "vite": "^7.3.1"
   }
