@@ -43,3 +43,7 @@
 <!-- ex const pizzaPromise = new Promise((resolve, reject) => { 
 resolve('Pizza is ready!'); //you can set the resolve or reject to a button click or any other event to determine when the promise is fulfilled or rejected.
 }); -->
+<!--.then is used to chain at a base level so there is not a nesting hell for readability.-->
+<!--.catch is to handle errors in a promise chain, it is called when a promise is rejected.-->
+<!--.finally is used to execute code after a promise is settled, regardless of whether it was resolved or rejected.-->
+<!--this is useful for cleanup tasks or actions that should happen after a promise is completed, such as hiding a loading spinner or resetting form fields.-->
