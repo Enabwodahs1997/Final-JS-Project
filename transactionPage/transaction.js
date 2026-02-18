@@ -17,6 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
   setupCategoryDropdown();
   setupFormSubmit();
   setupTypeChange();
+  setupBudgetOverdraftWarning();
 });
 // The above code sets up event listeners and initializes the form when the DOM is fully loaded. It ensures that the date field is set to today's date, the category dropdown is populated based on the selected transaction type, and the form submission is handled properly.
 function initializeDateField() {
@@ -27,7 +28,14 @@ function initializeDateField() {
 // The initializeDateField function sets the value of the date input field to today's date in the format 'YYYY-MM-DD'. This ensures that when the user opens the form, the date field is pre-filled with the current date, making it more convenient for them to log transactions without having to manually select the date each time.
 function setupTypeChange() {
   const typeSelect = document.getElementById('transactionType');
-  typeSelect.addEventListener('change', updateCategories);
+  typeSelect.addEventListener('change', () => {
+    updateCategories();
+    // Hide overdraft warning if switching away from expense
+    const overdraftWarning = document.getElementById('overdraftWarning');
+    if (typeSelect.value !== 'expense') {
+      overdraftWarning.style.display = 'none';
+    }
+  });
 } 
 function updateCategories() {
   const typeSelect = document.getElementById('transactionType');
@@ -48,6 +56,24 @@ function updateCategories() {
   }
 }
 // The setupTypeChange function adds an event listener to the transaction type dropdown. Whenever the user changes the transaction type (e.g., from "Income" to "Expense"), the updateCategories function is called to refresh the category dropdown options based on the selected type. This ensures that users only see relevant categories for the type of transaction they are logging, improving the user experience and making it easier to categorize transactions accurately.
+
+function setupBudgetOverdraftWarning() {
+  const amountInput = document.getElementById('amount');
+  amountInput.addEventListener('input', function() {
+    const amount = parseFloat(this.value);
+    const budget = parseFloat(document.getElementById('budget').value);
+    const transactionType = document.getElementById('transactionType').value;
+    const overdraftWarning = document.getElementById('overdraftWarning');
+    
+    if (transactionType === 'expense' && amount > budget) {
+      overdraftWarning.textContent = 'You are exceeding your budget!';
+      overdraftWarning.style.display = 'block';
+    } else {
+      overdraftWarning.style.display = 'none';
+    }
+  });
+}
+
 function setupCategoryDropdown() {
   updateCategories();
 }
