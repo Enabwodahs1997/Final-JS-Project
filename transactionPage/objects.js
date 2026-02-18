@@ -1,3 +1,6 @@
+//this is just all my objects to try to keep the code organized and clean, it is imported into the history.js file to be used 
+// for the categories of transactions.
+
 export const categories = {
   income: [
     {
