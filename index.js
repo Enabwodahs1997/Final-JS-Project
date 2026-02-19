@@ -7,13 +7,30 @@
 // making the application interactive and user-friendly.
 
 import { initializeChart, updateChart } from './chart.js'; //importing the logic for my chart I want to add
+import { getSelectedCurrency, setSelectedCurrency, convertCurrency, formatCurrency, getSupportedCurrencies } from './currency.js';
 
 const STORAGE_KEY = 'financeTransactions';
 document.addEventListener('DOMContentLoaded', async () => {
+  initializeCurrencySelector();
   await loadAndDisplayData();
   setupEventListeners();
+  setupCurrencyListener();
 });
-// The above code sets up an event listener for when the DOM content is fully loaded. Once the page is ready, it calls the loadAndDisplayData function to fetch and display the transaction data, and then sets up event listeners for user interactions such as adding a new transaction or viewing transaction history. This ensures that the application is initialized properly and ready for user interaction as soon as the page loads.
+// Initialize the currency selector with the saved currency
+function initializeCurrencySelector() {
+  const currencySelect = document.getElementById('currencySelect');
+  const savedCurrency = getSelectedCurrency();
+  currencySelect.value = savedCurrency;
+}
+
+// Setup listener for currency selector changes
+function setupCurrencyListener() {
+  const currencySelect = document.getElementById('currencySelect');
+  currencySelect.addEventListener('change', async (e) => {
+    setSelectedCurrency(e.target.value);
+    await loadAndDisplayData();
+  });
+}
 async function loadAndDisplayData() {
   const transactions = await getTransactions();
   await updateFinancialOverview(transactions);
@@ -68,19 +85,32 @@ function calculateTotals(transactions) {
 // The calculateTotals function takes an array of transaction objects and calculates the total income, total expenses, and remaining balance. It iterates through each transaction, adding the amount to either totalIncome or totalExpenses based on the transaction type. Finally, it returns an object containing these calculated values, which can be used to update the financial overview display on the page.
 async function updateFinancialOverview(transactions) {
   const { totalIncome, totalExpenses, remainingBalance } = calculateTotals(transactions);
-  // Update the DOM elements with the calculated totals
-  document.getElementById('totalIncome').textContent = `$${totalIncome.toFixed(2)}`;
-  document.getElementById('totalExpenses').textContent = `$${totalExpenses.toFixed(2)}`;
-  document.getElementById('remainingBalance').textContent = `$${remainingBalance.toFixed(2)}`;
+  const selectedCurrency = getSelectedCurrency();
+  
+  // Convert amounts to the selected currency if not USD
+  let displayIncome = totalIncome;
+  let displayExpenses = totalExpenses;
+  let displayBalance = remainingBalance;
+  
+  if (selectedCurrency !== 'USD') {
+    displayIncome = await convertCurrency(totalIncome, 'USD', selectedCurrency);
+    displayExpenses = await convertCurrency(totalExpenses, 'USD', selectedCurrency);
+    displayBalance = await convertCurrency(remainingBalance, 'USD', selectedCurrency);
+  }
+  
+  // Update the DOM elements with the converted amounts
+  document.getElementById('totalIncome').textContent = formatCurrency(displayIncome, selectedCurrency);
+  document.getElementById('totalExpenses').textContent = formatCurrency(displayExpenses, selectedCurrency);
+  document.getElementById('remainingBalance').textContent = formatCurrency(displayBalance, selectedCurrency);
+  
   // Change the color of the remaining balance based on whether it's positive or negative
   const balanceElement = document.getElementById('remainingBalance');
-  if (remainingBalance >= 0) {
+  if (displayBalance >= 0) {
     balanceElement.style.color = '#28a745';
   } else {
     balanceElement.style.color = '#dc3545';
   }
 }
-// The updateFinancialOverview function updates the financial overview section of the page with the calculated totals. It sets the text content of the total income, total expenses, and remaining balance elements to display the respective values formatted as currency. Additionally, it changes the color of the remaining balance to green if it's positive or red if it's negative, providing a visual cue to the user about their financial status.
 // Setup event listeners for buttons
 function setupEventListeners() {
   const addTransactionBtn = document.getElementById('addTransactionBtn');

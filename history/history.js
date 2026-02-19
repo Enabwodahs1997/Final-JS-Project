@@ -1,22 +1,45 @@
+import { getSelectedCurrency, setSelectedCurrency, convertCurrency, formatCurrency } from '../currency.js';
+
 const STORAGE_KEY = 'financeTransactions';
+let displayedTransactions = []; // Store the currently displayed transactions
+
 document.addEventListener('DOMContentLoaded', async () => {
+  initializeCurrencySelector();
   await loadAndDisplayTransactions();
   setupFilterListener();
   setupClearButton();
   setupDeleteListeners();
+  setupCurrencyListener();
 });
-//this retrieves transactions from local storage.
+// Initialize the currency selector with the saved currency
+function initializeCurrencySelector() {
+  const currencySelect = document.getElementById('currencySelect');
+  const savedCurrency = getSelectedCurrency();
+  currencySelect.value = savedCurrency;
+}
+
+// Setup listener for currency selector changes
+function setupCurrencyListener() {
+  const currencySelect = document.getElementById('currencySelect');
+  currencySelect.addEventListener('change', async (e) => {
+    setSelectedCurrency(e.target.value);
+    await displayTransactions(displayedTransactions);
+  });
+}
+
+//this is to load transactions and display them on the page.
+async function loadAndDisplayTransactions() {
+  const transactions = getTransactions();
+  await displayTransactions(transactions);
+}
+
 function getTransactions() {
   const data = localStorage.getItem(STORAGE_KEY);
   return data ? JSON.parse(data) : []; //this will return an empty array if there are no transactions stored.
 }
-//this is to load transactions and display them on the page.
-async function loadAndDisplayTransactions() {
-  const transactions = await getTransactions();
-  await displayTransactions(transactions);
-}
 //this function takes the array of transactions and creates HTML for each. 
 async function displayTransactions(transactions) {
+  displayedTransactions = transactions; // Store for currency changes
   const container = document.getElementById('transactionsList');
 //returns a message if there is nothing to show. Otherwise it skips the message and shows the transactions.
   if (transactions.length === 0) {
@@ -26,13 +49,24 @@ async function displayTransactions(transactions) {
 // Sort transactions by date in descending order (newest first)
   const sortedTransactions = [...transactions].sort((a, b) => new Date(b.date) - new Date(a.date));
 // Generate HTML for each transaction and join them into a single string to set as innerHTML of the container.
-  container.innerHTML = sortedTransactions.map(transaction => createTransactionCard(transaction)).join('');
+  container.innerHTML = await Promise.all(sortedTransactions.map(transaction => createTransactionCard(transaction))).then(html => html.join(''));
 }
 //this function creates the HTML for a single transaction card, it formats the date and amount based on the type of transaction (income or expense).
-function createTransactionCard(transaction) {
+async function createTransactionCard(transaction) {
   const date = new Date(transaction.date).toLocaleDateString();
   const sign = transaction.type === 'income' ? '+' : '-';
   const amountClass = transaction.type === 'income' ? 'income-amount' : 'expense-amount';
+  
+  // Get selected currency and convert amount
+  const selectedCurrency = getSelectedCurrency();
+  let displayAmount = transaction.amount;
+  
+  if (selectedCurrency !== 'USD') {
+    displayAmount = await convertCurrency(transaction.amount, 'USD', selectedCurrency);
+  }
+  
+  const formattedAmount = formatCurrency(displayAmount, selectedCurrency);
+  
 //this is what it will return for each transaction, it will be a card with the category, date, notes, amount and a delete button.
   return `
     <div class="transaction-card ${transaction.type}">
@@ -44,7 +78,7 @@ function createTransactionCard(transaction) {
         </div>
       </div>
       <div class="transaction-right">
-        <p class="transaction-amount ${amountClass}">${sign}$${transaction.amount.toFixed(2)}</p>
+        <p class="transaction-amount ${amountClass}">${sign}${formattedAmount}</p>
         <button class="btn-delete" data-id="${transaction.id}" title="Delete transaction">×</button>
       </div>
     </div>

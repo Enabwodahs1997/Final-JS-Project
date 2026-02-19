@@ -16,6 +16,44 @@ h1 {
   -webkit-text-fill-color: transparent;
 }
 
+.currency-selector {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-2xl);
+  padding: var(--spacing-md);
+  background: var(--card-bg);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-sm);
+}
+
+.currency-selector label {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.currency-selector select {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 2px solid var(--primary-color);
+  border-radius: var(--border-radius);
+  background-color: var(--card-bg);
+  color: var(--text-primary);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: border-color 0.3s ease;
+}
+
+.currency-selector select:hover {
+  border-color: var(--secondary-color);
+}
+
+.currency-selector select:focus {
+  outline: none;
+  border-color: var(--secondary-color);
+  box-shadow: 0 0 0 3px rgba(102, 51, 153, 0.1);
+}
+
 .financial-overview {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -92,6 +130,16 @@ h1 {
   h1 {
     font-size: 1.5rem;
     margin-bottom: var(--spacing-xl);
+  }
+
+  .currency-selector {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--spacing-sm);
+  }
+
+  .currency-selector select {
+    width: 100%;
   }
   
   .financial-overview {
