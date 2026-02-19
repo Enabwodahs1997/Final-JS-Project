@@ -237,29 +237,56 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  .transaction-card {
-    background-color: var(--neutral-800);
-  }
-
-  .filter-group select {
-    background-color: var(--neutral-800);
-    border-color: var(--neutral-700);
+  body {
+    background-color: var(--neutral-900);
     color: var(--neutral-100);
   }
 
-  .filter-group select:focus {
-    background-color: var(--neutral-700);
+  .history-container {
+    background-color: var(--neutral-800);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .history-header h1 {
+    color: var(--neutral-100);
   }
 
   .filter-group label {
     color: var(--secondary-light);
   }
 
+  .filter-group select {
+    background-color: var(--neutral-700);
+    border-color: var(--neutral-600);
+    color: var(--neutral-100);
+  }
+
+  .filter-group select:focus {
+    background-color: var(--neutral-600);
+    border-color: var(--primary-color);
+  }
+
+  .transaction-card {
+    background-color: var(--neutral-700);
+  }
+
+  .transaction-card:hover {
+    background-color: var(--neutral-600);
+  }
+
   .transaction-category {
     color: var(--neutral-100);
   }
 
+  .transaction-date {
+    color: var(--neutral-400);
+  }
+
   .transaction-notes {
     color: var(--neutral-300);
+  }
+
+  .no-transactions {
+    color: var(--neutral-400);
   }
 }

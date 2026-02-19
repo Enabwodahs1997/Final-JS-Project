@@ -128,21 +128,45 @@
 }
 
 @media (prefers-color-scheme: dark) {
+  body {
+    background-color: var(--neutral-900);
+    color: var(--neutral-100);
+  }
+
+  .transaction-container {
+    background-color: var(--neutral-800);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .transaction-header h1 {
+    color: var(--neutral-100);
+  }
+
+  .form-group label {
+    color: var(--secondary-light);
+  }
+
   .form-group input,
   .form-group select,
   .form-group textarea {
-    background-color: var(--neutral-800);
-    border-color: var(--neutral-700);
+    background-color: var(--neutral-700);
+    border-color: var(--neutral-600);
     color: var(--neutral-100);
   }
 
   .form-group input:focus,
   .form-group select:focus,
   .form-group textarea:focus {
-    background-color: var(--neutral-700);
+    background-color: var(--neutral-600);
+    border-color: var(--primary-color);
   }
 
-  .form-group label {
-    color: var(--secondary-light);
+  .success-message {
+    background-color: rgba(16, 185, 129, 0.1);
+    color: #10B981;
+  }
+
+  .overdraft-warning {
+    color: #EF4444;
   }
 }
