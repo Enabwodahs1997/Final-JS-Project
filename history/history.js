@@ -1,41 +1,21 @@
-import { getSelectedCurrency, setSelectedCurrency, convertCurrency, formatCurrency } from '../currency.js';
+import { getSelectedCurrency, convertCurrency, formatCurrency } from '../currency.js';
+import { setupCurrencySelectors } from '../currencySelector.js';
+import { getTransactions, saveTransactions, clearTransactions, deleteTransaction } from '../storage.js';
 
-const STORAGE_KEY = 'financeTransactions';
 let displayedTransactions = []; // Store the currently displayed transactions
 
 document.addEventListener('DOMContentLoaded', async () => {
-  initializeCurrencySelector();
+  await setupCurrencySelectors('currencySelect', () => displayTransactions(displayedTransactions));
   await loadAndDisplayTransactions();
   setupFilterListener();
   setupClearButton();
   setupDeleteListeners();
-  setupCurrencyListener();
 });
-// Initialize the currency selector with the saved currency
-function initializeCurrencySelector() {
-  const currencySelect = document.getElementById('currencySelect');
-  const savedCurrency = getSelectedCurrency();
-  currencySelect.value = savedCurrency;
-}
-
-// Setup listener for currency selector changes
-function setupCurrencyListener() {
-  const currencySelect = document.getElementById('currencySelect');
-  currencySelect.addEventListener('change', async (e) => {
-    setSelectedCurrency(e.target.value);
-    await displayTransactions(displayedTransactions);
-  });
-}
 
 //this is to load transactions and display them on the page.
 async function loadAndDisplayTransactions() {
   const transactions = getTransactions();
   await displayTransactions(transactions);
-}
-
-function getTransactions() {
-  const data = localStorage.getItem(STORAGE_KEY);
-  return data ? JSON.parse(data) : []; //this will return an empty array if there are no transactions stored.
 }
 //this function takes the array of transactions and creates HTML for each. 
 async function displayTransactions(transactions) {
@@ -109,7 +89,7 @@ async function handleClearHistory() {
   const confirm = window.confirm('Are you sure you want to clear all transaction history? This cannot be undone.');
 //if the user confirms, it will remove the transactions and reload the displayed transactions, which will show the message that there are no transactions.
   if (confirm) {
-    localStorage.removeItem(STORAGE_KEY);
+    clearTransactions();
     await loadAndDisplayTransactions();
   }
 }
@@ -121,9 +101,7 @@ document.addEventListener('click', (e) => {
 });
 //this function deletes a specific transaction by its ID from localStorage, then reloads the displayed transactions.
 async function handleDeleteTransaction(transactionId) {
-  const transactions = getTransactions();
-  const filtered = transactions.filter(t => t.id !== parseInt(transactionId));
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
+  deleteTransaction(transactionId);
   await loadAndDisplayTransactions();
   setupDeleteListeners();
 }

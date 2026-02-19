@@ -1,19 +1,8 @@
 import { categories } from './objects.js';
 import axios from 'axios';
-
-const STORAGE_KEY = 'financeTransactions';
-const API_URL = 'http://localhost:3001/api/transactions';
-
-function delay(ms) {
-  // Returns a Promise that waits for 'ms' milliseconds before continuing
-  return new Promise(function(resolve) {
-    // setTimeout calls resolve after the delay is done
-    setTimeout(function() {
-      resolve();
-    }, ms);
-  });
-}
-// The delay function is a utility that allows us to pause execution for a specified amount of time. It returns a Promise that resolves after the given number of milliseconds, which can be used with async/await to create delays in our code, such as showing a success message for a few seconds before hiding it again.
+import { addTransaction as addTransactionStorage, getTransactions } from '../storage.js';
+import { API_URL } from '../constants.js';
+import { delay, showMessage } from '../utils.js';
 document.addEventListener('DOMContentLoaded', () => {
   initializeDateField();
   setupCategoryDropdown();
@@ -136,9 +125,7 @@ function validateFormData(data) {
 }
 // The validateFormData function checks if the required fields in the form data are filled out correctly. It ensures that the transaction type and category are selected, the amount is a positive number, and a date is provided. If any of these conditions are not met, the function returns false, indicating that the form data is invalid and should not be processed further.
 function addTransactionToStorage(transaction) {
-  const transactions = getTransactions();
-  transactions.push(transaction);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(transactions));
+  addTransactionStorage(transaction);
   
   // Send to API in background without blocking UI (demonstrates axios logic)
   axios.post(API_URL, transaction).catch(() => {
@@ -148,18 +135,10 @@ function addTransactionToStorage(transaction) {
 // The addTransactionToStorage function saves a transaction to localStorage immediately for fast UI updates. 
 // It also attempts to send the transaction to the API in the background without blocking, demonstrating axios usage.
 // If the API call fails, it logs a message but the transaction is already safely stored locally.
-function getTransactions() {
-  const data = localStorage.getItem(STORAGE_KEY);
-  return data ? JSON.parse(data) : [];
-}
-// The getTransactions function retrieves the transaction data from local storage. If there is data stored under the specified key, it parses the JSON string into an array of transaction objects and returns it. If there is no data (i.e., the user has not logged any transactions yet), it returns an empty array. This function is essential for accessing the stored transactions when displaying them in the transaction history or performing calculations based on the transaction data.
 async function showSuccessMessage() {
-  const message = document.getElementById('successMessage');
-  message.style.display = 'block';
-  await delay(3000);
-  message.style.display = 'none';
+  showMessage('successMessage', 3000);
 }
-//  The showSuccessMessage function displays a success message to the user when a transaction is successfully added. It makes the message visible, waits for 3 seconds using the delay function, and then hides the message again. This provides feedback to the user that their transaction has been logged without requiring them to take any additional action.
+//  The showSuccessMessage function displays a success message to the user when a transaction is successfully added. It makes the message visible, waits for 3 seconds, and then hides the message again. This provides feedback to the user that their transaction has been logged without requiring them to take any additional action.
 function resetForm() {
   const form = document.getElementById('transactionForm');
   form.reset();

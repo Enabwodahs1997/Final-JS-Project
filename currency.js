@@ -1,9 +1,5 @@
 import axios from 'axios';
-
-const CURRENCY_STORAGE_KEY = 'selectedCurrency';
-const EXCHANGE_RATES_KEY = 'exchangeRates';
-const RATES_CACHE_TIME = 'ratesCacheTime';
-const CACHE_DURATION_MS = 86400000; // 24 hours
+import { CURRENCY_STORAGE_KEY, EXCHANGE_RATES_KEY, RATES_CACHE_TIME, CACHE_DURATION_MS } from './constants.js';
 
 // Supported currencies for conversion
 const SUPPORTED_CURRENCIES = {

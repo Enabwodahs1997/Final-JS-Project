@@ -6,46 +6,23 @@
 // and updating the financial overview. Event listeners are set up to respond to user interactions, 
 // making the application interactive and user-friendly.
 
-import { initializeChart, updateChart } from './chart.js'; //importing the logic for my chart I want to add
-import { getSelectedCurrency, setSelectedCurrency, convertCurrency, formatCurrency, getSupportedCurrencies } from './currency.js';
-
-const STORAGE_KEY = 'financeTransactions';
+import { initializeChart, updateChart } from './chart.js';
+import { getSelectedCurrency, convertCurrency, formatCurrency } from './currency.js';
+import { setupCurrencySelectors } from './currencySelector.js';
+import { getTransactions, saveTransactions } from './storage.js';
+import { STORAGE_KEY } from './constants.js';
 document.addEventListener('DOMContentLoaded', async () => {
-  initializeCurrencySelector();
+  await setupCurrencySelectors('currencySelect', loadAndDisplayData);
   await loadAndDisplayData();
   setupEventListeners();
-  setupCurrencyListener();
 });
-// Initialize the currency selector with the saved currency
-function initializeCurrencySelector() {
-  const currencySelect = document.getElementById('currencySelect');
-  const savedCurrency = getSelectedCurrency();
-  currencySelect.value = savedCurrency;
-}
-
-// Setup listener for currency selector changes
-function setupCurrencyListener() {
-  const currencySelect = document.getElementById('currencySelect');
-  currencySelect.addEventListener('change', async (e) => {
-    setSelectedCurrency(e.target.value);
-    await loadAndDisplayData();
-  });
-}
 async function loadAndDisplayData() {
-  const transactions = await getTransactions();
+  const transactions = getTransactions();
   await updateFinancialOverview(transactions);
   initializeChart(transactions);
 }
 // The loadAndDisplayData function is responsible for fetching the transaction data from local storage and updating the financial overview section of the page. It calls the getTransactions function to retrieve the stored transactions and then passes that data to the updateFinancialOverview function, which calculates totals and updates the display accordingly. This function is called when the DOM content is loaded to ensure that the user sees their current financial status as soon as they access the page.
-function getTransactions() {
-  const data = localStorage.getItem(STORAGE_KEY);
-  return data ? JSON.parse(data) : [];
-}
-// The getTransactions function retrieves transactions from local storage. If there is data stored, it parses the JSON string and returns it. If there is no data, it returns an empty array.
-function saveTransactions(transactions) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(transactions));
-}
-// The saveTransactions function saves transactions to local storage.
+
 async function addTransaction(description, amount, type) {
   const transactions = getTransactions();
   const transaction = {
