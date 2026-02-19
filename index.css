@@ -30,7 +30,7 @@ h1 {
 
 .currency-selector label {
   font-weight: 600;
-  color: var(--text-primary);
+  color: var(--text-secondary);
 }
 
 .currency-selector select {
@@ -38,7 +38,7 @@ h1 {
   border: 2px solid var(--primary-color);
   border-radius: var(--border-radius);
   background-color: var(--card-bg);
-  color: var(--text-primary);
+  color: var(--primary-color);
   font-size: 1rem;
   cursor: pointer;
   transition: border-color 0.3s ease;

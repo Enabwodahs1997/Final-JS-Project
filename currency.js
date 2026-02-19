@@ -43,16 +43,16 @@ export function getSupportedCurrencies() {
 async function fetchExchangeRates() {
   try {
     const response = await axios.get('https://api.exchangerate-api.com/v4/latest/USD');
-    const rates = response.data.rates;
+    const rates = response.data.rates; //decided to use axios for this for accuracy and I thought it would be fine it was more delayed from the rest of the page because it makes sense it would take time to fetch the data and make sure it is accurate
     
     // Cache the rates with timestamp
-    localStorage.setItem(EXCHANGE_RATES_KEY, JSON.stringify(rates));
-    localStorage.setItem(RATES_CACHE_TIME, Date.now().toString());
+    localStorage.setItem(EXCHANGE_RATES_KEY, JSON.stringify(rates)); // Store the rates in local storage
+    localStorage.setItem(RATES_CACHE_TIME, Date.now().toString()); // Store the current time to track cache validity
     
     return rates;
   } catch (error) {
     console.warn('Failed to fetch exchange rates:', error.message);
-    return null;
+    return null; // Return null on failure to indicate rates are unavailable if any issues
   }
 }
 
@@ -76,7 +76,7 @@ export async function convertCurrency(amount, fromCurrency, toCurrency) {
     return amount;
   }
   
-  const rates = await getExchangeRates();
+  const rates = await getExchangeRates(); // Get the latest exchange rates (from cache or API) for the conversion function
   
   if (!rates) {
     console.warn('Unable to convert currency, using original amount');
@@ -104,7 +104,7 @@ export async function getExchangeRate(fromCurrency, toCurrency) {
     return 1;
   }
   
-  const rates = await getExchangeRates();
+  const rates = await getExchangeRates(); // Get the latest exchange rates (from cache or API) for the exchange rate function
   
   if (!rates) {
     return 1;
