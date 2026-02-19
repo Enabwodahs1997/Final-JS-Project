@@ -6,22 +6,9 @@
 // and updating the financial overview. Event listeners are set up to respond to user interactions, 
 // making the application interactive and user-friendly.
 
-import axios from 'axios';
 import { initializeChart, updateChart } from './chart.js'; //importing the logic for my chart I want to add
 
 const STORAGE_KEY = 'financeTransactions';
-const API_URL = 'http://localhost:3001/api/transactions'; // Backend API endpoint for transactions
-
-function delay(ms) {
-  // Returns a Promise that waits for 'ms' milliseconds before continuing
-  return new Promise(function(resolve) {
-    // setTimeout calls resolve after the delay is done
-    setTimeout(function() {
-      resolve();
-    }, ms);
-  });
-}
-// The delay function is a utility that allows us to pause execution for a specified amount of time. It returns a Promise that resolves after the given number of milliseconds, which can be used with async/await to create delays in our code, such as showing a success message for a few seconds before hiding it again.
 document.addEventListener('DOMContentLoaded', async () => {
   await loadAndDisplayData();
   setupEventListeners();
@@ -33,32 +20,17 @@ async function loadAndDisplayData() {
   initializeChart(transactions);
 }
 // The loadAndDisplayData function is responsible for fetching the transaction data from local storage and updating the financial overview section of the page. It calls the getTransactions function to retrieve the stored transactions and then passes that data to the updateFinancialOverview function, which calculates totals and updates the display accordingly. This function is called when the DOM content is loaded to ensure that the user sees their current financial status as soon as they access the page.
-async function getTransactions() {
-  try {
-    // Try to fetch transactions from the backend API using axios
-    const response = await axios.get(API_URL);
-    return response.data;
-  } catch (error) {
-    // If the API call fails, fall back to localStorage
-    console.warn('API unavailable, using localStorage:', error.message);
-    const data = localStorage.getItem(STORAGE_KEY);
-    return data ? JSON.parse(data) : [];
-  }
+function getTransactions() {
+  const data = localStorage.getItem(STORAGE_KEY);
+  return data ? JSON.parse(data) : [];
 }
-// The getTransactions function attempts to retrieve transactions from a backend API using axios. If the API is unavailable or returns an error, it gracefully falls back to storing and retrieving data from local storage. This dual approach ensures that the application remains functional even if the backend is temporarily down.
-async function saveTransactions(transactions) {
-  try {
-    // Try to save transactions to the backend API using axios
-    await axios.post(API_URL, { transactions });
-  } catch (error) {
-    // If the API call fails, fall back to saving in localStorage
-    console.warn('API unavailable, saving to localStorage:', error.message);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(transactions));
-  }
+// The getTransactions function retrieves transactions from local storage. If there is data stored, it parses the JSON string and returns it. If there is no data, it returns an empty array.
+function saveTransactions(transactions) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(transactions));
 }
-// The saveTransactions function attempts to save transactions to a backend API using axios with a POST request. If the API is unavailable or returns an error, it falls back to storing the data in local storage. This ensures data persistence regardless of API availability.
+// The saveTransactions function saves transactions to local storage.
 async function addTransaction(description, amount, type) {
-  const transactions = await getTransactions();
+  const transactions = getTransactions();
   const transaction = {
     id: Date.now(),
     description,
@@ -68,7 +40,7 @@ async function addTransaction(description, amount, type) {
   };
   // Save the transaction to local storage and provide feedback to the user
   transactions.push(transaction);
-  await saveTransactions(transactions);
+  saveTransactions(transactions);
   await loadAndDisplayData();
   updateChart(transactions);
   

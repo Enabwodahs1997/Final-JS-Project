@@ -122,8 +122,8 @@ async function handleFormSubmit(e) {
   };
 // Save the transaction to local storage and provide feedback to the user
   await addTransactionToStorage(transaction);
-  await showSuccessMessage();
   resetForm();
+  showSuccessMessage();
 }
 // The handleFormSubmit function is responsible for processing the form data when the user submits the transaction form. It first prevents the default form submission behavior, then gathers the input values into a structured object. It validates the form data to ensure all required fields are filled and that the amount is a positive number. If validation passes, it creates a transaction object with a unique ID and saves it to local storage. Finally, it shows a success message to the user and resets the form for the next entry.
 function validateFormData(data) {
@@ -135,20 +135,19 @@ function validateFormData(data) {
   );
 }
 // The validateFormData function checks if the required fields in the form data are filled out correctly. It ensures that the transaction type and category are selected, the amount is a positive number, and a date is provided. If any of these conditions are not met, the function returns false, indicating that the form data is invalid and should not be processed further.
-async function addTransactionToStorage(transaction) {
-  try {
-    // Try to save transaction to the backend API using axios
-    const response = await axios.post(API_URL, transaction);
-    console.log('Transaction saved to API:', response.data);
-  } catch (error) {
-    // If the API call fails, fall back to localStorage
-    console.warn('API unavailable, saving to localStorage:', error.message);
-    const transactions = getTransactions();
-    transactions.push(transaction);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(transactions));
-  }
+function addTransactionToStorage(transaction) {
+  const transactions = getTransactions();
+  transactions.push(transaction);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(transactions));
+  
+  // Send to API in background without blocking UI (demonstrates axios logic)
+  axios.post(API_URL, transaction).catch(() => {
+    console.log('API unavailable, transaction saved to localStorage');
+  });
 }
-// The addTransactionToStorage function attempts to save a single transaction to a backend API using axios with a POST request. If the API is unavailable or returns an error, it retrieves the existing transactions from localStorage, adds the new transaction, and saves the updated array back to localStorage. This ensures reliable data persistence.
+// The addTransactionToStorage function saves a transaction to localStorage immediately for fast UI updates. 
+// It also attempts to send the transaction to the API in the background without blocking, demonstrating axios usage.
+// If the API call fails, it logs a message but the transaction is already safely stored locally.
 function getTransactions() {
   const data = localStorage.getItem(STORAGE_KEY);
   return data ? JSON.parse(data) : [];
