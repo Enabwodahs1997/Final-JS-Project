@@ -31,6 +31,7 @@ function initializeDateField() {
 function setupTypeChange() {
   const typeSelect = document.getElementById('transactionType');
   typeSelect.addEventListener('change', () => {
+    clearFormInputs();
     updateCategories();
     // Hide overdraft warning if switching away from expense
     const overdraftWarning = document.getElementById('overdraftWarning');
@@ -38,6 +39,15 @@ function setupTypeChange() {
       overdraftWarning.style.display = 'none';
     }
   });
+}
+
+function clearFormInputs() {
+  // Clear input fields when switching transaction type
+  document.getElementById('amount').value = '';
+  document.getElementById('notes').value = '';
+  document.getElementById('category').value = '';
+  // Reset date to today
+  initializeDateField();
 } 
 function updateCategories() {
   const typeSelect = document.getElementById('transactionType');

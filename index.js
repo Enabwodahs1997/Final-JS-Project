@@ -7,6 +7,7 @@
 // making the application interactive and user-friendly.
 
 import axios from 'axios';
+import { initializeChart, updateChart } from './chart.js'; //importing the logic for my chart I want to add
 
 const STORAGE_KEY = 'financeTransactions';
 const API_URL = 'http://localhost:3001/api/transactions'; // Backend API endpoint for transactions
@@ -29,6 +30,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 async function loadAndDisplayData() {
   const transactions = await getTransactions();
   await updateFinancialOverview(transactions);
+  initializeChart(transactions);
 }
 // The loadAndDisplayData function is responsible for fetching the transaction data from local storage and updating the financial overview section of the page. It calls the getTransactions function to retrieve the stored transactions and then passes that data to the updateFinancialOverview function, which calculates totals and updates the display accordingly. This function is called when the DOM content is loaded to ensure that the user sees their current financial status as soon as they access the page.
 async function getTransactions() {
@@ -68,6 +70,7 @@ async function addTransaction(description, amount, type) {
   transactions.push(transaction);
   await saveTransactions(transactions);
   await loadAndDisplayData();
+  updateChart(transactions);
   
   return transaction;
 }
@@ -127,5 +130,7 @@ function handleAddTransaction() {
 function handleViewHistory() {
   window.location.href = './history/history.html';
 }
+
+
 // The handleViewHistory function is called when the user clicks the "View History" button. It redirects the user to the transaction history page where they can see a list of all their logged transactions. Similar to handleAddTransaction, it uses window.location.href to navigate to the specified page.
 export { addTransaction, getTransactions, calculateTotals };

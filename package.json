@@ -22,7 +22,8 @@
   },
   "homepage": "https://github.com/Enabwodahs1997/Final-JS-Project#readme",
   "dependencies": {
-    "axios": "^1.6.0"
+    "axios": "^1.6.0",
+    "chart.js": "^4.5.1"
   },
   "devDependencies": {
     "vite": "^7.3.1"
