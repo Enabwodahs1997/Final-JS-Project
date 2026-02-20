@@ -3,5 +3,19 @@
   "devCommand": "npm run dev",
   "installCommand": "npm install",
   "framework": "vite",
-  "outputDirectory": "dist"
+  "outputDirectory": "dist",
+  "routes": [
+    {
+      "src": "/transactionPage/(.*)",
+      "dest": "/transactionPage/$1"
+    },
+    {
+      "src": "/history/(.*)",
+      "dest": "/history/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/$1"
+    }
+  ]
 }
