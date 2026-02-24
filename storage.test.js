@@ -24,12 +24,12 @@ describe('addTransaction', () => {
       
       // setItem(key, value) - Stores a value
       setItem(key, value) { 
-        this.data[key] = value; 
+        this.data[key] = value; //makes an array of key value pairs to store the data in local storage.
       },
       
       // removeItem(key) - Deletes a value
       removeItem(key) { 
-        delete this.data[key]; 
+        delete this.data[key]; // Removes the key array from storage
       },
       
       // clear() - Deletes everything
