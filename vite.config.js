@@ -13,6 +13,7 @@ export default {
         main: resolve(__dirname, 'index.html'),
         transaction: resolve(__dirname, 'transactionPage/transaction.html'),
         history: resolve(__dirname, 'history/history.html'),
+        budget: resolve(__dirname, 'budgetPage/budget.html'),
       },
     },
   },
