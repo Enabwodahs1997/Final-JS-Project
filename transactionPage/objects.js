@@ -96,5 +96,93 @@ export const categories = {
       color: '#6B7280',
       description: 'Other miscellaneous expenses'
     }
+  ],
+  debt: [
+    {
+      id: 'credit_card',
+      name: 'Credit Card',
+      icon: '💳',
+      color: '#DC2626',
+      description: 'Credit card debt'
+    },
+    {
+      id: 'student_loan',
+      name: 'Student Loan',
+      icon: '🎓',
+      color: '#F97316',
+      description: 'Student loan debt'
+    },
+    {
+      id: 'personal_loan',
+      name: 'Personal Loan',
+      icon: '💰',
+      color: '#EF4444',
+      description: 'Personal loan debt'
+    },
+    {
+      id: 'car_loan',
+      name: 'Car Loan',
+      icon: '🚗',
+      color: '#DC2626',
+      description: 'Auto loan debt'
+    },
+    {
+      id: 'mortgage',
+      name: 'Mortgage',
+      icon: '🏠',
+      color: '#DC2626',
+      description: 'Home mortgage debt'
+    },
+    {
+      id: 'other_debt',
+      name: 'Other Debt',
+      icon: '📊',
+      color: '#6B7280',
+      description: 'Other types of debt'
+    }
+  ],
+  debtPayment: [
+    {
+      id: 'credit_card_payment',
+      name: 'Credit Card Payment',
+      icon: '💳',
+      color: '#06B6D4',
+      description: 'Payment towards credit card debt'
+    },
+    {
+      id: 'student_loan_payment',
+      name: 'Student Loan Payment',
+      icon: '🎓',
+      color: '#06B6D4',
+      description: 'Payment towards student loan'
+    },
+    {
+      id: 'personal_loan_payment',
+      name: 'Personal Loan Payment',
+      icon: '💰',
+      color: '#06B6D4',
+      description: 'Payment towards personal loan'
+    },
+    {
+      id: 'car_loan_payment',
+      name: 'Car Loan Payment',
+      icon: '🚗',
+      color: '#06B6D4',
+      description: 'Payment towards car loan'
+    },
+    {
+      id: 'mortgage_payment',
+      name: 'Mortgage Payment',
+      icon: '🏠',
+      color: '#06B6D4',
+      description: 'Payment towards mortgage'
+    },
+    {
+      id: 'other_debt_payment',
+      name: 'Other Debt Payment',
+      icon: '📊',
+      color: '#06B6D4',
+      description: 'Payment towards other debt'
+    }
   ]
 };
