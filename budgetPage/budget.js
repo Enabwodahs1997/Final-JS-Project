@@ -66,6 +66,25 @@ function updateRemainingBudget(category, newRemaining) {
   showMessage('successMessage', 2000);
 } //this is for the update remaining button, it only updates the remaining budget without changing the limit.
 
+// Remove budget completely
+function removeBudget(category) {
+  const budgets = getCategoryBudgets();
+  const remainingBudgets = getRemainingBudgets();
+  
+  // Remove from both storage objects
+  delete budgets[category];
+  delete remainingBudgets[category];
+  
+  // Save updated data
+  localStorage.setItem(CATEGORY_BUDGETS_KEY, JSON.stringify(budgets));
+  localStorage.setItem(REMAINING_BUDGETS_KEY, JSON.stringify(remainingBudgets));
+  
+  // Reload display
+  loadAndDisplayBudgets();
+  showMessage('successMessage', 2000);
+} //this removes the budget limit and remaining budget for a category entirely, 
+// allowing users to delete budgets they no longer want to track.
+
 // Get all expense categories from objects.js
 function getAllExpenseCategories() {
   if (categories.expense) {
@@ -171,6 +190,7 @@ function createBudgetCard(categoryId, categoryName, categoryIcon, limit, remaini
         <button class="btn-small btn-update" onclick="window.updateBudgetFromUI('${categoryId}')">Update Limit</button>
         <button class="btn-small btn-update" onclick="window.updateRemainingFromUI('${categoryId}')">Update Remaining</button>
         <button class="btn-small btn-reset" onclick="window.resetBudgetFromUI('${categoryId}')">Reset to Limit</button>
+        <button class="btn-small btn-delete" onclick="window.removeBudgetFromUI('${categoryId}')">Remove Budget</button>
       </div>
     </div>
   `;
@@ -205,6 +225,17 @@ window.updateRemainingFromUI = (categoryId) => {
 
 window.resetBudgetFromUI = (categoryId) => {
   resetBudget(categoryId);
+};
+
+window.removeBudgetFromUI = (categoryId) => {
+  const categoryName = document.querySelector(`[onclick*="${categoryId}"]`)?.closest('.budget-card')?.querySelector('.budget-category')?.textContent.trim();
+  const confirmMessage = categoryName 
+    ? `Are you sure you want to remove the budget for ${categoryName}? This cannot be undone.`
+    : 'Are you sure you want to remove this budget? This cannot be undone.';
+  
+  if (confirm(confirmMessage)) {
+    removeBudget(categoryId);
+  }
 };
 
 export { getCategoryBudgets, getRemainingBudgets, saveRemainingBudget };

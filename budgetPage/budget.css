@@ -131,6 +131,7 @@
 .budget-actions {
   display: flex;
   gap: 0.5rem;
+  flex-wrap: wrap;
 }
 
 .btn-small {
@@ -158,6 +159,15 @@
 
 .btn-reset:hover {
   opacity: 0.9;
+}
+
+.btn-delete {
+  background-color: #dc3545;
+  color: white;
+}
+
+.btn-delete:hover {
+  background-color: #c82333;
 }
 
 .success-message {
