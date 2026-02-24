@@ -60,19 +60,26 @@ function updateCategories() {
 
 function setupBudgetOverdraftWarning() {
   const amountInput = document.getElementById('amount');
-  amountInput.addEventListener('input', function() {
-    const amount = parseFloat(this.value);
-    const budget = parseFloat(document.getElementById('budget').value);
+  const budgetInput = document.getElementById('budget');
+  
+  // Function to check and display warning
+  const checkBudgetOverdraft = () => {
+    const amount = parseFloat(amountInput.value);
+    const budget = parseFloat(budgetInput.value);
     const transactionType = document.getElementById('transactionType').value;
     const overdraftWarning = document.getElementById('overdraftWarning');
     
-    if (transactionType === 'expense' && amount > budget) {
+    if (transactionType === 'expense' && !isNaN(amount) && !isNaN(budget) && amount > budget) {
       overdraftWarning.textContent = 'You are exceeding your budget!';
       overdraftWarning.style.display = 'block';
     } else {
       overdraftWarning.style.display = 'none';
     }
-  });
+  };
+  
+  // Listen to changes on both amount and budget inputs
+  amountInput.addEventListener('input', checkBudgetOverdraft);
+  budgetInput.addEventListener('input', checkBudgetOverdraft);
 }
 
 function setupCategoryDropdown() {
