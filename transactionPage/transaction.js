@@ -1,6 +1,6 @@
 import { categories } from './objects.js';
 import axios from 'axios';
-import { addTransaction as addTransactionStorage, getTransactions } from '../storage.js';
+import { addTransaction as addTransactionStorage, getTransactions, saveTransactions, processRecurringTransactions } from '../storage.js';
 import { API_URL } from '../constants.js';
 import { delay, showMessage } from '../utils.js';
 document.addEventListener('DOMContentLoaded', () => {
@@ -35,6 +35,8 @@ function clearFormInputs() {
   document.getElementById('amount').value = '';
   document.getElementById('notes').value = '';
   document.getElementById('category').value = '';
+  document.getElementById('budget').value = '';
+  document.getElementById('reoccuring').value = '';
   // Reset date to today
   initializeDateField();
 } 
@@ -99,6 +101,7 @@ async function handleFormSubmit(e) {
     category: document.getElementById('category').value,
     amount: parseFloat(document.getElementById('amount').value),
     date: document.getElementById('date').value,
+    reoccuring: parseInt(document.getElementById('reoccuring').value) || 0,
     notes: document.getElementById('notes').value
   };
 // Validate the form data before proceeding
@@ -114,12 +117,13 @@ async function handleFormSubmit(e) {
     type: formData.transactionType,
     date: new Date(formData.date).toISOString(),
     category: formData.category,
-    notes: formData.notes
+    notes: formData.notes,
+    reoccuring: formData.reoccuring
   };
 // Save the transaction to local storage and provide feedback to the user
   await addTransactionToStorage(transaction);
   resetForm();
-  showSuccessMessage();
+  showSuccessMessage(transaction.reoccuring);
 }
 // The handleFormSubmit function is responsible for processing the form data when the user submits the transaction form. It first prevents the default form submission behavior, then gathers the input values into a structured object. It validates the form data to ensure all required fields are filled and that the amount is a positive number. If validation passes, it creates a transaction object with a unique ID and saves it to local storage. Finally, it shows a success message to the user and resets the form for the next entry.
 function validateFormData(data) {
@@ -131,7 +135,9 @@ function validateFormData(data) {
   );
 }
 // The validateFormData function checks if the required fields in the form data are filled out correctly. It ensures that the transaction type and category are selected, the amount is a positive number, and a date is provided. If any of these conditions are not met, the function returns false, indicating that the form data is invalid and should not be processed further.
+
 function addTransactionToStorage(transaction) {
+  // Just save the base transaction - recurring instances will be created dynamically based on current date
   addTransactionStorage(transaction);
   
   // Send to API in background without blocking UI (demonstrates axios logic)
@@ -139,10 +145,22 @@ function addTransactionToStorage(transaction) {
     console.log('API unavailable, transaction saved to localStorage');
   });
 }
+  axios.post(API_URL, transaction).catch(() => {
+    console.log('API unavailable, transaction saved to localStorage');
+  });
+
 // The addTransactionToStorage function saves a transaction to localStorage immediately for fast UI updates. 
 // It also attempts to send the transaction to the API in the background without blocking, demonstrating axios usage.
 // If the API call fails, it logs a message but the transaction is already safely stored locally.
-async function showSuccessMessage() {
+async function showSuccessMessage(recurringDays) {
+  const messageElement = document.getElementById('successMessage');
+  
+  if (recurringDays && recurringDays > 0) {
+    messageElement.textContent = `Transaction saved successfully! This will recur every ${recurringDays} days automatically.`;
+  } else {
+    messageElement.textContent = 'Transaction saved successfully!';
+  }
+  
   showMessage('successMessage', 3000);
 }
 //  The showSuccessMessage function displays a success message to the user when a transaction is successfully added. It makes the message visible, waits for 3 seconds, and then hides the message again. This provides feedback to the user that their transaction has been logged without requiring them to take any additional action.

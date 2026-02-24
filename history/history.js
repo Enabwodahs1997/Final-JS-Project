@@ -1,6 +1,6 @@
 import { getSelectedCurrency, convertCurrency, formatCurrency } from '../currency.js';
 import { setupCurrencySelectors } from '../currencySelector.js';
-import { getTransactions, saveTransactions, clearTransactions, deleteTransaction } from '../storage.js';
+import { getTransactions, saveTransactions, clearTransactions, deleteTransaction, processRecurringTransactions } from '../storage.js';
 
 let displayedTransactions = []; // Store the currently displayed transactions
 
@@ -14,6 +14,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 //this is to load transactions and display them on the page.
 async function loadAndDisplayTransactions() {
+  // Process recurring transactions to create new instances if due
+  processRecurringTransactions();
+  
   const transactions = getTransactions();
   await displayTransactions(transactions);
 }
