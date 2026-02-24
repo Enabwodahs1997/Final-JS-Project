@@ -3,12 +3,17 @@ import axios from 'axios';
 import { addTransaction as addTransactionStorage, getTransactions, saveTransactions, processRecurringTransactions } from '../storage.js';
 import { API_URL } from '../constants.js';
 import { delay, showMessage } from '../utils.js';
+
+const CATEGORY_BUDGETS_KEY = 'categoryBudgets';
+const REMAINING_BUDGETS_KEY = 'remainingBudgets';
+
 document.addEventListener('DOMContentLoaded', () => {
   initializeDateField();
   setupCategoryDropdown();
   setupFormSubmit();
   setupTypeChange();
   setupBudgetOverdraftWarning();
+  setupCategoryBudgetAutoFill();
 });
 // The above code sets up event listeners and initializes the form when the DOM is fully loaded. It ensures that the date field is set to today's date, the category dropdown is populated based on the selected transaction type, and the form submission is handled properly.
 function initializeDateField() {
@@ -63,31 +68,114 @@ function updateCategories() {
 function setupBudgetOverdraftWarning() {
   const amountInput = document.getElementById('amount');
   const budgetInput = document.getElementById('budget');
+  const categorySelect = document.getElementById('category');
   
   // Function to check and display warning
   const checkBudgetOverdraft = () => {
     const amount = parseFloat(amountInput.value);
-    const budget = parseFloat(budgetInput.value);
     const transactionType = document.getElementById('transactionType').value;
+    const category = categorySelect.value;
     const overdraftWarning = document.getElementById('overdraftWarning');
     
-    if (transactionType === 'expense' && !isNaN(amount) && !isNaN(budget) && amount > budget) {
-      overdraftWarning.textContent = 'You are exceeding your budget!';
-      overdraftWarning.style.display = 'block';
+    if (transactionType === 'expense' && !isNaN(amount) && category) {
+      const remainingBudget = getRemainingBudget(category);
+      
+      if (remainingBudget > 0 && amount > remainingBudget) {
+        overdraftWarning.textContent = `Warning: This will exceed your remaining budget of $${remainingBudget.toFixed(2)}!`;
+        overdraftWarning.style.display = 'block';
+      } else {
+        overdraftWarning.style.display = 'none';
+      }
     } else {
       overdraftWarning.style.display = 'none';
     }
   };
   
-  // Listen to changes on both amount and budget inputs
+  // Listen to changes on amount, budget, and category
   amountInput.addEventListener('input', checkBudgetOverdraft);
   budgetInput.addEventListener('input', checkBudgetOverdraft);
+  categorySelect.addEventListener('change', checkBudgetOverdraft);
 }
 
 function setupCategoryDropdown() {
   updateCategories();
 }
 // The setupCategoryDropdown function is called when the DOM content is loaded to initially populate the category dropdown based on the default selected transaction type. This ensures that when the user first opens the form, they see the appropriate categories without having to change the transaction type first. It calls the updateCategories function, which handles the logic of populating the category options based on the selected transaction type.
+
+// Functions for managing category budgets
+function getCategoryBudgets() {
+  const data = localStorage.getItem(CATEGORY_BUDGETS_KEY);
+  return data ? JSON.parse(data) : {};
+}
+
+function saveCategoryBudget(category, budget) {
+  const budgets = getCategoryBudgets();
+  budgets[category] = budget;
+  localStorage.setItem(CATEGORY_BUDGETS_KEY, JSON.stringify(budgets));
+}
+
+function getCategoryBudget(category) {
+  const budgets = getCategoryBudgets();
+  return budgets[category] || '';
+}
+
+// Functions for managing remaining budgets
+function getRemainingBudgets() {
+  const data = localStorage.getItem(REMAINING_BUDGETS_KEY);
+  return data ? JSON.parse(data) : {};
+}
+
+function saveRemainingBudget(category, remaining) {
+  const remainingBudgets = getRemainingBudgets();
+  remainingBudgets[category] = parseFloat(remaining);
+  localStorage.setItem(REMAINING_BUDGETS_KEY, JSON.stringify(remainingBudgets));
+}
+
+function getRemainingBudget(category) {
+  const remainingBudgets = getRemainingBudgets();
+  const budgets = getCategoryBudgets();
+  
+  // If no remaining budget is set, use the full budget limit
+  if (remainingBudgets[category] !== undefined) {
+    return remainingBudgets[category];
+  } else if (budgets[category] !== undefined) {
+    return budgets[category];
+  }
+  return 0;
+}
+
+function deductFromRemainingBudget(category, amount) {
+  const currentRemaining = getRemainingBudget(category);
+  const newRemaining = currentRemaining - amount;
+  saveRemainingBudget(category, newRemaining);
+  return newRemaining;
+}
+
+function setupCategoryBudgetAutoFill() {
+  const categorySelect = document.getElementById('category');
+  const budgetInput = document.getElementById('budget');
+  
+  categorySelect.addEventListener('change', () => {
+    const selectedCategory = categorySelect.value;
+    if (selectedCategory) {
+      const savedBudget = getCategoryBudget(selectedCategory);
+      const remainingBudget = getRemainingBudget(selectedCategory);
+      
+      // Show the limit in the budget field
+      budgetInput.value = savedBudget;
+      
+      // Update the placeholder to show remaining budget
+      if (remainingBudget !== savedBudget && savedBudget) {
+        budgetInput.placeholder = `Remaining: $${remainingBudget.toFixed(2)}`;
+      } else {
+        budgetInput.placeholder = '0.00';
+      }
+    } else {
+      budgetInput.value = '';
+      budgetInput.placeholder = '0.00';
+    }
+  });
+}
 function setupFormSubmit() {
   const form = document.getElementById('transactionForm');
   form.addEventListener('submit', async (e) => await handleFormSubmit(e));
@@ -102,13 +190,33 @@ async function handleFormSubmit(e) {
     amount: parseFloat(document.getElementById('amount').value),
     date: document.getElementById('date').value,
     reoccuring: parseInt(document.getElementById('reoccuring').value) || 0,
-    notes: document.getElementById('notes').value
+    notes: document.getElementById('notes').value,
+    budget: parseFloat(document.getElementById('budget').value) || 0
   };
 // Validate the form data before proceeding
   if (!validateFormData(formData)) {
     alert('Please fill in all required fields');
     return;
   }
+// Save budget limit for this category if provided
+  if (formData.budget > 0) {
+    saveCategoryBudget(formData.category, formData.budget);
+    
+    // Initialize remaining budget if not already set
+    const remainingBudgets = getRemainingBudgets();
+    if (remainingBudgets[formData.category] === undefined) {
+      saveRemainingBudget(formData.category, formData.budget);
+    }
+  }
+  
+  // Deduct from remaining budget if this is an expense
+  if (formData.transactionType === 'expense') {
+    const newRemaining = deductFromRemainingBudget(formData.category, formData.amount);
+    
+    // Optional: Log the budget update for user feedback
+    console.log(`Budget updated for ${formData.category}: $${newRemaining.toFixed(2)} remaining`);
+  }
+
 // Create a transaction object with the form data and additional metadata
   const transaction = {
     id: Date.now(),
@@ -145,9 +253,6 @@ function addTransactionToStorage(transaction) {
     console.log('API unavailable, transaction saved to localStorage');
   });
 }
-  axios.post(API_URL, transaction).catch(() => {
-    console.log('API unavailable, transaction saved to localStorage');
-  });
 
 // The addTransactionToStorage function saves a transaction to localStorage immediately for fast UI updates. 
 // It also attempts to send the transaction to the API in the background without blocking, demonstrating axios usage.

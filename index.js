@@ -95,6 +95,8 @@ async function updateFinancialOverview(transactions) {
 function setupEventListeners() {
   const addTransactionBtn = document.getElementById('addTransactionBtn');
   const transactionHistoryBtn = document.getElementById('transactionHistoryBtn');
+  const budgetManagementBtn = document.getElementById('budgetManagementBtn');
+  
   // Add click event listeners to the buttons to handle user interactions
   if (addTransactionBtn) {
     addTransactionBtn.addEventListener('click', handleAddTransaction);
@@ -102,6 +104,10 @@ function setupEventListeners() {
   // The setupEventListeners function adds click event listeners to the "Add Transaction" and "View History" buttons. When the user clicks the "Add Transaction" button, it calls the handleAddTransaction function, which redirects the user to the transaction form page. When the user clicks the "View History" button, it calls the handleViewHistory function, which redirects the user to the transaction history page. This allows users to easily navigate between different sections of the application based on their needs.
   if (transactionHistoryBtn) {
     transactionHistoryBtn.addEventListener('click', handleViewHistory);
+  }
+  
+  if (budgetManagementBtn) {
+    budgetManagementBtn.addEventListener('click', handleBudgetManagement);
   }
 }
 // The setupEventListeners function adds click event listeners to the "Add Transaction" and "View History" buttons. When the user clicks the "Add Transaction" button, it calls the handleAddTransaction function, which redirects the user to the transaction form page. When the user clicks the "View History" button, it calls the handleViewHistory function, which redirects the user to the transaction history page. This allows users to easily navigate between different sections of the application based on their needs.
@@ -111,6 +117,10 @@ function handleAddTransaction() {
 // The handleAddTransaction function is called when the user clicks the "Add Transaction" button. It redirects the user to the transaction form page where they can input details for a new transaction. This function uses window.location.href to change the current URL, effectively navigating the user to the specified page.
 function handleViewHistory() {
   window.location.href = './history/history.html';
+}
+
+function handleBudgetManagement() {
+  window.location.href = './budgetPage/budget.html';
 }
 
 
