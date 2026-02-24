@@ -16,7 +16,10 @@ document.addEventListener('DOMContentLoaded', () => {
   setupCategoryBudgetAutoFill();
   setupRecurringIntervalToggle();
 });
-// The above code sets up event listeners and initializes the form when the DOM is fully loaded. It ensures that the date field is set to today's date, the category dropdown is populated based on the selected transaction type, and the form submission is handled properly.
+// The above code sets up event listeners and initializes the form when the DOM is fully loaded. 
+// It ensures that the date field is set to today's date, the category dropdown is populated based 
+// on the selected transaction type, and the form submission is handled properly.
+
 function initializeDateField() {
   const dateInput = document.getElementById('date');
   const today = new Date().toISOString().split('T')[0];
@@ -59,7 +62,7 @@ function updateCategories() {
     categories[selectedType].forEach(cat => {
       const option = document.createElement('option');
       option.value = cat.id;
-      option.textContent = `${cat.icon} ${cat.name}`;
+      option.textContent = `${cat.icon} ${cat.name}`; //cat is the category object from objects.js, it has the name and the icon for each category, so this will show the icon and the name in the dropdown.
       option.dataset.color = cat.color;
       option.dataset.description = cat.description;
       categorySelect.appendChild(option);
@@ -72,7 +75,10 @@ function setupBudgetOverdraftWarning() {
   const amountInput = document.getElementById('amount');
   const budgetInput = document.getElementById('budget');
   const categorySelect = document.getElementById('category');
-  
+  //this is the function I am calling above of overdraft warning, 
+  // it checks if the amount entered exceeds the remaining budget for the selected category 
+  // and shows a warning message if it does.
+
   // Function to check and display warning
   const checkBudgetOverdraft = () => {
     const amount = parseFloat(amountInput.value);
