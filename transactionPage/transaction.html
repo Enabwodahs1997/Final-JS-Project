@@ -53,9 +53,19 @@
           <label for="date">Date</label>
           <input type="date" id="date" name="date" required>
         </div>
+        
         <div class="form-group">
-          <label for="reoccuring">Reoccuring (Days)</label>
-          <input type="number" id="reoccuring" name="reoccuring" step="1" min="0" placeholder="0">
+          <label for="recurringInterval">Recurring Interval</label>
+          <select id="recurringInterval" name="recurringInterval">
+            <option value="none">None</option>
+            <option value="days">Days</option>
+            <option value="weeks">Weeks</option>
+          </select>
+        </div>
+        
+        <div class="form-group" id="recurringAmountGroup" style="display: none;">
+          <label for="recurringAmount" id="recurringAmountLabel">Recurring Every</label>
+          <input type="number" id="recurringAmount" name="recurringAmount" step="1" min="1" placeholder="1">
         </div>
         <div class="form-group">
           <label for="notes">Notes (Optional)</label>

@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
   setupTypeChange();
   setupBudgetOverdraftWarning();
   setupCategoryBudgetAutoFill();
+  setupRecurringIntervalToggle();
 });
 // The above code sets up event listeners and initializes the form when the DOM is fully loaded. It ensures that the date field is set to today's date, the category dropdown is populated based on the selected transaction type, and the form submission is handled properly.
 function initializeDateField() {
@@ -41,7 +42,9 @@ function clearFormInputs() {
   document.getElementById('notes').value = '';
   document.getElementById('category').value = '';
   document.getElementById('budget').value = '';
-  document.getElementById('reoccuring').value = '';
+  document.getElementById('recurringInterval').value = 'none';
+  document.getElementById('recurringAmount').value = '';
+  document.getElementById('recurringAmountGroup').style.display = 'none';
   // Reset date to today
   initializeDateField();
 } 
@@ -151,6 +154,24 @@ function deductFromRemainingBudget(category, amount) {
   return newRemaining;
 }
 
+function setupRecurringIntervalToggle() {
+  const intervalSelect = document.getElementById('recurringInterval');
+  const amountGroup = document.getElementById('recurringAmountGroup');
+  const amountLabel = document.getElementById('recurringAmountLabel');
+  
+  intervalSelect.addEventListener('change', () => {
+    const selectedInterval = intervalSelect.value;
+    
+    if (selectedInterval === 'none') {
+      amountGroup.style.display = 'none';
+      document.getElementById('recurringAmount').value = '';
+    } else {
+      amountGroup.style.display = 'block';
+      amountLabel.textContent = selectedInterval === 'days' ? 'Recurring Every (Days)' : 'Recurring Every (Weeks)';
+    }
+  });
+}
+
 function setupCategoryBudgetAutoFill() {
   const categorySelect = document.getElementById('category');
   const budgetInput = document.getElementById('budget');
@@ -184,12 +205,25 @@ function setupFormSubmit() {
 async function handleFormSubmit(e) {
   e.preventDefault();
 // Gather form data into an object for easier handling
+  const recurringInterval = document.getElementById('recurringInterval').value;
+  const recurringAmount = parseInt(document.getElementById('recurringAmount').value) || 0;
+  
+  // Convert to days for storage
+  let recurringDays = 0;
+  if (recurringInterval === 'days' && recurringAmount > 0) {
+    recurringDays = recurringAmount;
+  } else if (recurringInterval === 'weeks' && recurringAmount > 0) {
+    recurringDays = recurringAmount * 7; // Convert weeks to days
+  }
+  
   const formData = {
     transactionType: document.getElementById('transactionType').value,
     category: document.getElementById('category').value,
     amount: parseFloat(document.getElementById('amount').value),
     date: document.getElementById('date').value,
-    reoccuring: parseInt(document.getElementById('reoccuring').value) || 0,
+    recurringDays: recurringDays,
+    recurringInterval: recurringInterval,
+    recurringAmount: recurringAmount,
     notes: document.getElementById('notes').value,
     budget: parseFloat(document.getElementById('budget').value) || 0
   };
@@ -226,12 +260,14 @@ async function handleFormSubmit(e) {
     date: new Date(formData.date).toISOString(),
     category: formData.category,
     notes: formData.notes,
-    reoccuring: formData.reoccuring
+    reoccuring: formData.recurringDays, // Store in days
+    recurringInterval: formData.recurringInterval,
+    recurringAmount: formData.recurringAmount
   };
 // Save the transaction to local storage and provide feedback to the user
   await addTransactionToStorage(transaction);
   resetForm();
-  showSuccessMessage(transaction.reoccuring);
+  showSuccessMessage(transaction.reoccuring, transaction.recurringInterval, transaction.recurringAmount);
 }
 // The handleFormSubmit function is responsible for processing the form data when the user submits the transaction form. It first prevents the default form submission behavior, then gathers the input values into a structured object. It validates the form data to ensure all required fields are filled and that the amount is a positive number. If validation passes, it creates a transaction object with a unique ID and saves it to local storage. Finally, it shows a success message to the user and resets the form for the next entry.
 function validateFormData(data) {
@@ -257,11 +293,24 @@ function addTransactionToStorage(transaction) {
 // The addTransactionToStorage function saves a transaction to localStorage immediately for fast UI updates. 
 // It also attempts to send the transaction to the API in the background without blocking, demonstrating axios usage.
 // If the API call fails, it logs a message but the transaction is already safely stored locally.
-async function showSuccessMessage(recurringDays) {
+async function showSuccessMessage(recurringDays, interval, amount) {
   const messageElement = document.getElementById('successMessage');
   
-  if (recurringDays && recurringDays > 0) {
-    messageElement.textContent = `Transaction saved successfully! This will recur every ${recurringDays} days automatically.`;
+  if (recurringDays && recurringDays > 0 && interval !== 'none') {
+    const intervalText = interval === 'weeks' ? `${amount} week${amount > 1 ? 's' : ''}` : `${amount} day${amount > 1 ? 's' : ''}`;
+    messageElement.textContent = `Transaction saved successfully! This will recur every ${intervalText} automatically.`;
+  } else {
+    messageElement.textContent = 'Transaction saved successfully!';
+  }
+  
+  showMessage('successMessage', 3000);
+}
+
+async function showSuccessMessage(recurringWeeks) {
+  const messageElement = document.getElementById('successMessage');
+  
+  if (recurringWeeks && recurringWeeks > 0) {
+    messageElement.textContent = `Transaction saved successfully! This will recur every ${recurringWeeks} weeks automatically.`;
   } else {
     messageElement.textContent = 'Transaction saved successfully!';
   }
