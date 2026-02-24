@@ -106,6 +106,8 @@ p, a {
   cursor: pointer;
   transition: all var(--transition-base);
   text-decoration: none;
+  min-height: 44px;  /* Touch-friendly minimum size */
+  min-width: 44px;   /* Touch-friendly minimum size */
 }
 
 .btn:hover {

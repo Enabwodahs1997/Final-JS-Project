@@ -99,6 +99,59 @@
   }
 }
 
+@media (max-width: 480px) {
+  .transaction-container {
+    padding: var(--spacing-md);
+    margin: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .transaction-header {
+    flex-direction: column;
+    gap: var(--spacing-md);
+  }
+
+  .transaction-header h1 {
+    font-size: 1.25rem;
+    order: -1;
+  }
+
+  .transaction-header > div {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    width: 100%;
+  }
+
+  .transaction-header .btn {
+    width: 100%;
+    font-size: 0.9rem;
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    font-size: 16px;  /* Prevents zoom on iOS */
+    min-height: 44px;
+  }
+
+  .form-group label {
+    font-size: 0.9rem;
+  }
+
+  .form-actions {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+
+  .form-actions .btn {
+    width: 100%;
+    font-size: 0.9rem;
+    padding: var(--spacing-md);
+  }
+}
+
 @media (max-width: 768px) {
   .transaction-container {
     padding: var(--spacing-lg);

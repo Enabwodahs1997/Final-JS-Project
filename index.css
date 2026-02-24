@@ -170,6 +170,63 @@ h1 {
   }
 }
 
+@media (max-width: 480px) {
+  #app {
+    padding: var(--spacing-md);
+  }
+  
+  h1 {
+    font-size: 1.25rem;
+    margin-bottom: var(--spacing-lg);
+  }
+
+  .currency-selector {
+    flex-direction: column;
+    align-items: stretch;
+    padding: var(--spacing-sm);
+  }
+
+  .currency-selector select {
+    font-size: 16px;  /* Prevents zoom on iOS */
+    min-height: 44px;
+  }
+  
+  .financial-overview {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-sm);
+  }
+  
+  .financial-overview .card {
+    padding: var(--spacing-lg);
+  }
+  
+  .amount {
+    font-size: 1.5rem;
+  }
+  
+  .actions {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+  
+  .actions .btn {
+    width: 100%;
+    min-width: unset;
+    font-size: 0.9rem;
+    padding: var(--spacing-md);
+  }
+
+  .chart-container {
+    padding: var(--spacing-lg);
+    margin: 0 calc(-1 * var(--spacing-md));
+    border-radius: 0;
+  }
+
+  #transactionChart {
+    max-height: 250px;
+  }
+}
+
 @media (prefers-color-scheme: dark) {
   body {
     background-color: var(--neutral-900);
