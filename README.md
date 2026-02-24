@@ -1,5 +1,9 @@
 # Final-JS-Project
 
+## 🚀 Live Demo
+
+**[View Live App](https://final-js-project-zeta.vercel.app)**
+
 ## Project Description
 
 Final-JS-Project is a personal finance management application built with vanilla JavaScript, HTML, and CSS. This app helps users track their income and expenses, view their financial overview, and maintain a complete transaction history.
@@ -110,7 +114,11 @@ git push origin main
 
 3. Enable GitHub Pages in repository settings and select the `dist/` folder as the source.
 
-#### Vercel
+#### Vercel (Current Deployment)
+
+This project is currently deployed on Vercel at [https://final-js-project-zeta.vercel.app](https://final-js-project-zeta.vercel.app)
+
+To deploy updates:
 
 1. Connect your GitHub repository to Vercel
 2. Vercel will automatically build and deploy on every push
@@ -123,10 +131,6 @@ git push origin main
 2. Set build command: `npm run build`
 3. Set publish directory: `dist`
 4. Deploy!
-
-## Deployed App
-
-[Coming Soon] - Deploy your app and add the link here
 
 ## Technologies Used
 
