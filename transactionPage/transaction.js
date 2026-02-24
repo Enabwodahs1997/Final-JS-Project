@@ -305,18 +305,6 @@ async function showSuccessMessage(recurringDays, interval, amount) {
   
   showMessage('successMessage', 3000);
 }
-
-async function showSuccessMessage(recurringWeeks) {
-  const messageElement = document.getElementById('successMessage');
-  
-  if (recurringWeeks && recurringWeeks > 0) {
-    messageElement.textContent = `Transaction saved successfully! This will recur every ${recurringWeeks} weeks automatically.`;
-  } else {
-    messageElement.textContent = 'Transaction saved successfully!';
-  }
-  
-  showMessage('successMessage', 3000);
-}
 //  The showSuccessMessage function displays a success message to the user when a transaction is successfully added. It makes the message visible, waits for 3 seconds, and then hides the message again. This provides feedback to the user that their transaction has been logged without requiring them to take any additional action.
 function resetForm() {
   const form = document.getElementById('transactionForm');
