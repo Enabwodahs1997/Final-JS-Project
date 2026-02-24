@@ -2,6 +2,30 @@ import { getSelectedCurrency, convertCurrency, formatCurrency } from '../currenc
 import { setupCurrencySelectors } from '../currencySelector.js';
 import { getTransactions, saveTransactions, clearTransactions, deleteTransaction, processRecurringTransactions } from '../storage.js';
 
+const REMAINING_BUDGETS_KEY = 'remainingBudgets';
+
+// Helper functions for budget management
+function getRemainingBudgets() {
+  const data = localStorage.getItem(REMAINING_BUDGETS_KEY);
+  return data ? JSON.parse(data) : {};
+}
+
+function saveRemainingBudget(category, remaining) {
+  const remainingBudgets = getRemainingBudgets();
+  remainingBudgets[category] = parseFloat(remaining);
+  localStorage.setItem(REMAINING_BUDGETS_KEY, JSON.stringify(remainingBudgets));
+}
+
+function restoreBudgetFromExpense(category, amount) {
+  const remainingBudgets = getRemainingBudgets();
+  if (remainingBudgets[category] !== undefined) {
+    const newRemaining = remainingBudgets[category] + amount;
+    saveRemainingBudget(category, newRemaining);
+    return newRemaining;
+  }
+  return null;
+}
+
 let displayedTransactions = []; // Store the currently displayed transactions
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -92,6 +116,14 @@ async function handleClearHistory() {
   const confirm = window.confirm('Are you sure you want to clear all transaction history? This cannot be undone.');
 //if the user confirms, it will remove the transactions and reload the displayed transactions, which will show the message that there are no transactions.
   if (confirm) {
+    // Restore all budgets by adding back all expenses before clearing
+    const transactions = getTransactions();
+    transactions.forEach(transaction => {
+      if (transaction.type === 'expense') {
+        restoreBudgetFromExpense(transaction.category, transaction.amount);
+      }
+    });
+    
     clearTransactions();
     await loadAndDisplayTransactions();
   }
@@ -104,6 +136,18 @@ document.addEventListener('click', (e) => {
 });
 //this function deletes a specific transaction by its ID from localStorage, then reloads the displayed transactions.
 async function handleDeleteTransaction(transactionId) {
+  // Get the transaction before deleting to restore budget if it's an expense
+  const transactions = getTransactions();
+  const transaction = transactions.find(t => t.id === parseInt(transactionId));
+  
+  if (transaction && transaction.type === 'expense') {
+    // Restore the budget by adding the expense amount back
+    const restoredAmount = restoreBudgetFromExpense(transaction.category, transaction.amount);
+    if (restoredAmount !== null) {
+      console.log(`Budget restored for ${transaction.category}: $${restoredAmount.toFixed(2)}`);
+    }
+  }
+  
   deleteTransaction(transactionId);
   await loadAndDisplayTransactions();
   setupDeleteListeners();
