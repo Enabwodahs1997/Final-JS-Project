@@ -1,8 +1,7 @@
 import { getSelectedCurrency, convertCurrency, formatCurrency } from '../currency.js';
 import { setupCurrencySelectors } from '../currencySelector.js';
 import { getTransactions, saveTransactions, clearTransactions, deleteTransaction, processRecurringTransactions } from '../storage.js';
-
-const REMAINING_BUDGETS_KEY = 'remainingBudgets';
+import { REMAINING_BUDGETS_KEY } from '../constants.js';
 
 // Helper functions for budget management
 function getRemainingBudgets() {
@@ -58,28 +57,48 @@ async function displayTransactions(transactions) {
 // Generate HTML for each transaction and join them into a single string to set as innerHTML of the container.
   container.innerHTML = await Promise.all(sortedTransactions.map(transaction => createTransactionCard(transaction))).then(html => html.join(''));
 }
-//this function creates the HTML for a single transaction card, it formats the date and amount based on the type of transaction (income or expense).
+//this function creates the HTML for a single transaction card, it formats the date and amount based on the type of transaction (income, expense, debt, or debtPayment).
 async function createTransactionCard(transaction) {
   const date = new Date(transaction.date).toLocaleDateString();
-  const sign = transaction.type === 'income' ? '+' : '-';
-  const amountClass = transaction.type === 'income' ? 'income-amount' : 'expense-amount';
+  
+  // Determine sign and CSS class based on transaction type
+  let sign = '+';
+  let amountClass = 'income-amount';
+  let displayAmount = Math.abs(transaction.amount);
+  
+  if (transaction.type === 'income') {
+    sign = '+';
+    amountClass = 'income-amount';
+  } else if (transaction.type === 'expense') {
+    sign = '-';
+    amountClass = 'expense-amount';
+  } else if (transaction.type === 'debt') {
+    sign = '-';
+    amountClass = 'expense-amount';
+  } else if (transaction.type === 'debtPayment') {
+    sign = '-';
+    amountClass = 'debt-payment-amount';
+  }
   
   // Get selected currency and convert amount
   const selectedCurrency = getSelectedCurrency();
-  let displayAmount = transaction.amount;
+  let convertedAmount = displayAmount;
   
   if (selectedCurrency !== 'USD') {
-    displayAmount = await convertCurrency(transaction.amount, 'USD', selectedCurrency);
+    convertedAmount = await convertCurrency(displayAmount, 'USD', selectedCurrency);
   }
   
-  const formattedAmount = formatCurrency(displayAmount, selectedCurrency);
+  const formattedAmount = formatCurrency(convertedAmount, selectedCurrency);
+  
+  // Get transaction type label for display
+  const typeLabel = transaction.type === 'debt' ? 'Debt' : transaction.type === 'debtPayment' ? 'Debt Payment' : transaction.category;
   
 //this is what it will return for each transaction, it will be a card with the category, date, notes, amount and a delete button.
   return `
     <div class="transaction-card ${transaction.type}">
       <div class="transaction-left">
         <div class="transaction-info">
-          <h3 class="transaction-category">${transaction.category}</h3>
+          <h3 class="transaction-category">${typeLabel}</h3>
           <p class="transaction-date">${date}</p>
           <p class="transaction-notes">${transaction.notes || 'No notes'}</p>
         </div>

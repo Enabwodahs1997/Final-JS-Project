@@ -1,11 +1,8 @@
 import { categories } from './objects.js';
 import axios from 'axios';
 import { addTransaction as addTransactionStorage, getTransactions, saveTransactions, processRecurringTransactions } from '../storage.js';
-import { API_URL } from '../constants.js';
+import { API_URL, CATEGORY_BUDGETS_KEY, REMAINING_BUDGETS_KEY } from '../constants.js';
 import { delay, showMessage } from '../utils.js';
-
-const CATEGORY_BUDGETS_KEY = 'categoryBudgets';
-const REMAINING_BUDGETS_KEY = 'remainingBudgets';
 
 document.addEventListener('DOMContentLoaded', () => {
   initializeDateField();
@@ -31,10 +28,31 @@ function setupTypeChange() {
   typeSelect.addEventListener('change', () => {
     clearFormInputs();
     updateCategories();
-    // Hide overdraft warning if switching away from expense
+    
+    // Hide/show elements based on transaction type
     const overdraftWarning = document.getElementById('overdraftWarning');
+    const budgetInput = document.getElementById('budget');
+    const budgetGroup = budgetInput.closest('.form-group');
+    
     if (typeSelect.value !== 'expense') {
       overdraftWarning.style.display = 'none';
+    }
+    
+    // Hide budget field for debt and debtPayment types
+    if (typeSelect.value === 'debt' || typeSelect.value === 'debtPayment') {
+      budgetGroup.style.display = 'none';
+    } else {
+      budgetGroup.style.display = 'block';
+    }
+    
+    // Update amount label for clarity
+    const amountLabel = document.querySelector('label[for="amount"]');
+    if (typeSelect.value === 'debt') {
+      amountLabel.textContent = 'Amount Owed';
+    } else if (typeSelect.value === 'debtPayment') {
+      amountLabel.textContent = 'Payment Amount';
+    } else {
+      amountLabel.textContent = 'Amount';
     }
   });
 }
@@ -257,11 +275,20 @@ async function handleFormSubmit(e) {
     console.log(`Budget updated for ${formData.category}: $${newRemaining.toFixed(2)} remaining`);
   }
 
+  // Calculate the final amount based on transaction type
+  // Debt amounts are automatically negative (money owed)
+  // Debt payments are positive (reducing debt)
+  let finalAmount = formData.amount;
+  if (formData.transactionType === 'debt') {
+    finalAmount = -Math.abs(formData.amount); // Make debt negative
+  } else if (formData.transactionType === 'debtPayment') {
+    finalAmount = Math.abs(formData.amount); // Make payment positive (reduces negative debt)
+  }
+
 // Create a transaction object with the form data and additional metadata
   const transaction = {
     id: Date.now(),
-    description: `${formData.category} - ${formData.notes || 'No notes'}`,
-    amount: formData.amount,
+    amount: finalAmount,
     type: formData.transactionType,
     date: new Date(formData.date).toISOString(),
     category: formData.category,

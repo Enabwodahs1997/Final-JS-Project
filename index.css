@@ -84,6 +84,10 @@ h1 {
   margin: 0;
 }
 
+#totalDebt {
+  color: #dc3545;
+}
+
 .actions {
   display: flex;
   flex-wrap: wrap;

@@ -64,12 +64,22 @@ function prepareChartData(transactions) {
   const categories = {};
 
   transactions.forEach((transaction) => {
-    const key = transaction.type === 'income' ? 'Income' : transaction.description || 'Other Expense';
+    // Extract just the category part without the notes (everything before the " - " or use fallback)
+    let key = transaction.category || 'Other';
+    
+    if (transaction.type === 'income') {
+      key = 'Income';
+    } else if (transaction.type === 'debt') {
+      key = `Debt - ${transaction.category || 'Other'}`;
+    } else if (transaction.type === 'debtPayment') {
+      key = `Debt Payment - ${transaction.category || 'Other'}`;
+    }
     
     if (!categories[key]) {
       categories[key] = 0;
     }
-    categories[key] += transaction.amount;
+    // Use absolute value for chart so negatives display as positive
+    categories[key] += Math.abs(transaction.amount);
   });
 
   const labels = Object.keys(categories);
