@@ -86,7 +86,7 @@ function prepareChartData(transactions) {
   const data = Object.values(categories);
   const total = data.reduce((sum, val) => sum + val, 0);
 
-  // Color palette
+  // Color palette (excluding dark red which is reserved for debt)
   const colors = [
     '#4CAF50', // Green for income
     '#FF6384', // Red
@@ -95,11 +95,20 @@ function prepareChartData(transactions) {
     '#228B22', // Forest Green
     '#FF9F40', // Orange
     '#00BCD4', // Cyan
-    '#F44336', // Dark Red
   ];
 
-  // Cycle through colors if more categories than colors
-  const cycledColors = labels.map((_, index) => colors[index % colors.length]);
+  // Dark red reserved specifically for debt categories
+  const debtColor = '#8B0000'; // Dark Red
+
+  // Assign colors: dark red for debt, cycle through other colors for rest
+  const cycledColors = labels.map((label, index) => {
+    // Check if this is a debt category (starts with "Debt - ")
+    if (label.startsWith('Debt - ')) {
+      return debtColor;
+    }
+    // For other categories, cycle through the normal color palette
+    return colors[index % colors.length];
+  });
 
   return {
     labels,

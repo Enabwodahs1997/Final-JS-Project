@@ -55,7 +55,7 @@ function setupTypeChange() {
     
     if (typeSelect.value !== 'expense') {
       overdraftWarning.style.display = 'none';
-    }
+    } //just saying dont show if not expense
     
     // Hide budget field for debt and debtPayment types
     if (typeSelect.value === 'debt' || typeSelect.value === 'debtPayment') {
