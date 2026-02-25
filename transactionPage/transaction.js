@@ -119,15 +119,14 @@ function setupBudgetOverdraftWarning() {
   // Function to check and display warning
   const checkBudgetOverdraft = () => {
     const amount = parseFloat(amountInput.value);
+    const budget = parseFloat(budgetInput.value);
     const transactionType = document.getElementById('transactionType').value;
     const category = categorySelect.value;
     const overdraftWarning = document.getElementById('overdraftWarning');
     
-    if (transactionType === 'expense' && !isNaN(amount) && category) {
-      const remainingBudget = getRemainingBudget(category);
-      
-      if (remainingBudget > 0 && amount > remainingBudget) {
-        overdraftWarning.textContent = `Warning: This will exceed your remaining budget of $${remainingBudget.toFixed(2)}!`;
+    if (transactionType === 'expense' && !isNaN(amount) && category && !isNaN(budget)) {
+      if (amount > budget) {
+        overdraftWarning.textContent = `Warning: This will exceed your budget limit of $${budget.toFixed(2)}!`;
         overdraftWarning.style.display = 'block';
       } else {
         overdraftWarning.style.display = 'none';
