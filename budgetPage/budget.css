@@ -47,7 +47,7 @@
   font-family: inherit;
   font-size: 1rem;
   color: var(--text-color);
-  background-color: var(--primary-dark);
+  background-color: var(--primary-color);
   transition: all 0.3s ease;
   flex: 1;
   min-width: 180px;
@@ -172,7 +172,7 @@
   padding: 0.5rem;
   border: 1px solid var(--border-color);
   border-radius: 4px;
-  background: var(--primary-dark);
+  background: var(--primary-color);
   color: var(--text-color);
   font-size: 1rem;
 }
