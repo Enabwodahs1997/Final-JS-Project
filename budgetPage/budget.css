@@ -31,6 +31,55 @@
   color: var(--text-color);
 }
 
+.budget-form {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-top: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.budget-form select,
+.budget-form input {
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--border-color);
+  border-radius: var(--border-radius, 8px);
+  font-family: inherit;
+  font-size: 1rem;
+  color: var(--text-color);
+  background-color: var(--primary-dark);
+  transition: all 0.3s ease;
+  flex: 1;
+  min-width: 180px;
+}
+
+.budget-form select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1.25em;
+  padding-right: 2.5rem;
+}
+
+.budget-form select:hover,
+.budget-form input:hover {
+  border-color: var(--primary-color);
+}
+
+.budget-form select:focus,
+.budget-form input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(102, 51, 153, 0.1);
+}
+
+.budget-form button {
+  padding: 0.75rem 1.5rem;
+  white-space: nowrap;
+}
+
 .budget-list {
   display: grid;
   gap: 1rem;
@@ -123,7 +172,7 @@
   padding: 0.5rem;
   border: 1px solid var(--border-color);
   border-radius: 4px;
-  background: var(--background-color);
+  background: var(--primary-dark);
   color: var(--text-color);
   font-size: 1rem;
 }
@@ -214,6 +263,22 @@
     font-size: 0.9rem;
   }
 
+  .budget-form {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .budget-form select,
+  .budget-form input {
+    width: 100%;
+    font-size: 16px;  /* Prevents zoom on iOS */
+    min-height: 44px;
+  }
+
+  .budget-form button {
+    width: 100%;
+  }
+
   .budget-controls {
     flex-direction: column;
     gap: var(--spacing-sm);
@@ -251,6 +316,16 @@
   .budget-header {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .budget-form {
+    width: 100%;
+  }
+
+  .budget-form select,
+  .budget-form input,
+  .budget-form button {
+    min-width: 100%;
   }
 
   .budget-edit-form {

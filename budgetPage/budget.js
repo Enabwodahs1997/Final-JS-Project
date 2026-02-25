@@ -5,7 +5,42 @@ const CATEGORY_BUDGETS_KEY = 'categoryBudgets'; // Key for storing category budg
 const REMAINING_BUDGETS_KEY = 'remainingBudgets'; // Key for storing remaining budgets in local storage
 
 document.addEventListener('DOMContentLoaded', () => {
+  populateCategoryDropdown(); // Populate the category dropdown with expense categories
   loadAndDisplayBudgets(); // Load and display budgets when the page is loaded
+});
+
+// Populate category dropdown with expense categories
+function populateCategoryDropdown() {
+  const categorySelect = document.getElementById('categoryInput');
+  const expenseCategories = getAllExpenseCategories();
+  
+  // Clear existing options except the first one ("Select Category")
+  categorySelect.innerHTML = '<option value="">Select Category</option>';
+  
+  // Add each expense category as an option
+  expenseCategories.forEach(category => {
+    const option = document.createElement('option');
+    option.value = category.id;
+    option.textContent = `${category.icon} ${category.name}`;
+    categorySelect.appendChild(option);
+  });
+}
+
+document.getElementById('addBudgetBtn').addEventListener('click', () => {
+  const categoryInput = document.getElementById('categoryInput');
+  const amountInput = document.getElementById('amountInput');
+  const category = categoryInput.value.trim();
+  const amount = parseFloat(amountInput.value);
+  if (category && !isNaN(amount) && amount >= 0) {
+    saveCategoryBudget(category, amount);
+    saveRemainingBudget(category, amount);
+    loadAndDisplayBudgets();
+    categoryInput.value = '';
+    amountInput.value = '';
+    showMessage('successMessage', 2000);
+  } else {
+    alert('Please enter a valid category and budget amount');
+  }
 });
 
 // Get all category budgets (limits)
