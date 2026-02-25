@@ -12,10 +12,37 @@ document.addEventListener('DOMContentLoaded', () => {
   setupBudgetOverdraftWarning();
   setupCategoryBudgetAutoFill();
   setupRecurringIntervalToggle();
+  setupBudgetRefresh();
 });
 // The above code sets up event listeners and initializes the form when the DOM is fully loaded. 
 // It ensures that the date field is set to today's date, the category dropdown is populated based 
 // on the selected transaction type, and the form submission is handled properly.
+
+function setupBudgetRefresh() {
+  // Listen for visibility changes and refresh budget when page becomes visible
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) {
+      // Page is now visible, refresh the budget display
+      const categorySelect = document.getElementById('category');
+      const selectedCategory = categorySelect.value;
+      if (selectedCategory) {
+        const budgetInput = document.getElementById('budget');
+        const savedBudget = getCategoryBudget(selectedCategory);
+        const remainingBudget = getRemainingBudget(selectedCategory);
+        
+        // Update the budget field with the latest value from storage
+        budgetInput.value = savedBudget;
+        
+        // Update the placeholder to show remaining budget
+        if (remainingBudget !== savedBudget && savedBudget) {
+          budgetInput.placeholder = `Remaining: $${remainingBudget.toFixed(2)}`;
+        } else {
+          budgetInput.placeholder = '0.00';
+        }
+      }
+    }
+  });
+}
 
 function initializeDateField() {
   const dateInput = document.getElementById('date');
