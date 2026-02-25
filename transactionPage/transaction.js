@@ -27,18 +27,10 @@ function setupBudgetRefresh() {
       const selectedCategory = categorySelect.value;
       if (selectedCategory) {
         const budgetInput = document.getElementById('budget');
-        const savedBudget = getCategoryBudget(selectedCategory);
         const remainingBudget = getRemainingBudget(selectedCategory);
         
-        // Update the budget field with the latest value from storage
-        budgetInput.value = savedBudget;
-        
-        // Update the placeholder to show remaining budget
-        if (remainingBudget !== savedBudget && savedBudget) {
-          budgetInput.placeholder = `Remaining: $${remainingBudget.toFixed(2)}`;
-        } else {
-          budgetInput.placeholder = '0.00';
-        }
+        // Update the budget field with the remaining budget
+        budgetInput.value = remainingBudget;
       }
     }
   });
@@ -230,21 +222,12 @@ function setupCategoryBudgetAutoFill() {
   categorySelect.addEventListener('change', () => {
     const selectedCategory = categorySelect.value;
     if (selectedCategory) {
-      const savedBudget = getCategoryBudget(selectedCategory);
       const remainingBudget = getRemainingBudget(selectedCategory);
       
-      // Show the limit in the budget field
-      budgetInput.value = savedBudget;
-      
-      // Update the placeholder to show remaining budget
-      if (remainingBudget !== savedBudget && savedBudget) {
-        budgetInput.placeholder = `Remaining: $${remainingBudget.toFixed(2)}`;
-      } else {
-        budgetInput.placeholder = '0.00';
-      }
+      // Show the remaining budget in the budget field
+      budgetInput.value = remainingBudget;
     } else {
       budgetInput.value = '';
-      budgetInput.placeholder = '0.00';
     }
   });
 }
