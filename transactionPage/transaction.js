@@ -61,7 +61,7 @@ function setupTypeChange() {
     if (typeSelect.value === 'debt' || typeSelect.value === 'debtPayment') {
       budgetGroup.style.display = 'none';
     } else {
-      budgetGroup.style.display = 'block';
+      budgetGroup.style.display = 'flex';
     }
     
     // Update amount label for clarity
@@ -127,7 +127,7 @@ function setupBudgetOverdraftWarning() {
     if (transactionType === 'expense' && !isNaN(amount) && category && !isNaN(budget) && budget !== 0) {
       if (amount > budget) {
         overdraftWarning.textContent = `Warning: This will exceed your budget limit of $${budget.toFixed(2)}!`;
-        overdraftWarning.style.display = 'block';
+        overdraftWarning.style.display = 'flex';
       } else {
         overdraftWarning.style.display = 'none';
       }
@@ -208,7 +208,7 @@ function setupRecurringIntervalToggle() {
       amountGroup.style.display = 'none';
       document.getElementById('recurringAmount').value = '';
     } else {
-      amountGroup.style.display = 'block';
+      amountGroup.style.display = 'flex';
       amountLabel.textContent = selectedInterval === 'days' ? 'Recurring Every (Days)' : 'Recurring Every (Weeks)';
     }
   });
