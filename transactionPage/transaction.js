@@ -124,7 +124,7 @@ function setupBudgetOverdraftWarning() {
     const category = categorySelect.value;
     const overdraftWarning = document.getElementById('overdraftWarning');
     
-    if (transactionType === 'expense' && !isNaN(amount) && category && !isNaN(budget)) {
+    if (transactionType === 'expense' && !isNaN(amount) && category && !isNaN(budget) && budget !== 0) {
       if (amount > budget) {
         overdraftWarning.textContent = `Warning: This will exceed your budget limit of $${budget.toFixed(2)}!`;
         overdraftWarning.style.display = 'block';
