@@ -308,8 +308,18 @@ async function handleFormSubmit(e) {
   };
 // Save the transaction to local storage and provide feedback to the user
   await addTransactionToStorage(transaction);
-  resetForm();
-  showSuccessMessage(transaction.reoccuring, transaction.recurringInterval, transaction.recurringAmount);
+  
+  // For debt payments, redirect back to dashboard after showing success message
+  if (formData.transactionType === 'debtPayment') {
+    await showSuccessMessage(transaction.reoccuring, transaction.recurringInterval, transaction.recurringAmount);
+    // Redirect to dashboard to show updated debt and remaining balance
+    setTimeout(() => {
+      window.location.href = '../index.html';
+    }, 3500); // Allow message to display before redirect
+  } else {
+    resetForm();
+    showSuccessMessage(transaction.reoccuring, transaction.recurringInterval, transaction.recurringAmount);
+  }
 }
 // The handleFormSubmit function is responsible for processing the form data when the user submits the transaction form. It first prevents the default form submission behavior, then gathers the input values into a structured object. It validates the form data to ensure all required fields are filled and that the amount is a positive number. If validation passes, it creates a transaction object with a unique ID and saves it to local storage. Finally, it shows a success message to the user and resets the form for the next entry.
 function validateFormData(data) {

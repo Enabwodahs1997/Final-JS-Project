@@ -48,6 +48,7 @@ function calculateTotals(transactions) {
   let totalIncome = 0;
   let totalExpenses = 0;
   let totalDebt = 0;
+  let totalDebtPayments = 0; // Track debt payments separately
   // Loop through all transactions and calculate totals by type
   transactions.forEach(transaction => {
     if (transaction.type === 'income') {
@@ -55,24 +56,28 @@ function calculateTotals(transactions) {
     } else if (transaction.type === 'expense') {
       totalExpenses += transaction.amount;
     } else if (transaction.type === 'debt') {
-      // Debt is stored as negative, accumulate to get total owed
-      totalDebt += transaction.amount; // This will be negative
+      // Debt is stored as negative, so adding it increases the debt owed
+      totalDebt += transaction.amount; // e.g., totalDebt += (-100) = -100
     } else if (transaction.type === 'debtPayment') {
-      // Debt payments reduce the total debt (they're positive, so they reduce the negative)
-      totalDebt += transaction.amount;
+      // Debt payments are positive, so adding them reduces the debt owed
+      totalDebt += transaction.amount; // e.g., totalDebt += 50 makes it -50
+      totalDebtPayments += transaction.amount; // Track payments for remaining balance
     }
   });
   // Return an object containing the total income, total expenses, total debt, and remaining balance
   // Debt is tracked separately and only changes with debt/debtPayment transactions
-  // Remaining balance is independent of debt - only income minus expenses
+  // Remaining balance = income - expenses - debt payments (shows money paid toward debt, not debt balance)
+  const debtBalance = Math.abs(totalDebt); // Convert debt to positive for calculation
   return {
     totalIncome,
     totalExpenses,
-    totalDebt: Math.abs(totalDebt), // Display debt as positive number
-    remainingBalance: totalIncome - totalExpenses, // Keep debt separate from balance
+    totalDebt: debtBalance, // Display debt as positive number
+    remainingBalance: totalIncome - totalExpenses - totalDebtPayments, // Subtract payments, not balance
   };
 }
-// The calculateTotals function takes an array of transaction objects and calculates the total income, total expenses, and remaining balance. It iterates through each transaction, adding the amount to either totalIncome or totalExpenses based on the transaction type. Finally, it returns an object containing these calculated values, which can be used to update the financial overview display on the page.
+// The calculateTotals function takes an array of transaction objects and calculates the total income, total expenses, and remaining balance. 
+// It iterates through each transaction, adding the amount to either totalIncome or totalExpenses based on the transaction type. Finally, 
+// it returns an object containing these calculated values, which can be used to update the financial overview display on the page.
 async function updateFinancialOverview(transactions) {
   const { totalIncome, totalExpenses, totalDebt, remainingBalance } = calculateTotals(transactions);
   const selectedCurrency = getSelectedCurrency();
