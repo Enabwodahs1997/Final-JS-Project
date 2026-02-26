@@ -1,5 +1,6 @@
 import { categories } from '../transactionPage/objects.js'; //links to the other pages being used
 import { showMessage } from '../utils.js';
+import { getTransactions } from '../storage.js'; //import to access transactions for retroactive budgeting
 
 const CATEGORY_BUDGETS_KEY = 'categoryBudgets'; // Key for storing category budgets (limits) in local storage
 const REMAINING_BUDGETS_KEY = 'remainingBudgets'; // Key for storing remaining budgets in local storage
@@ -26,6 +27,24 @@ function populateCategoryDropdown() {
   });
 }
 
+// Calculate sum of expenses from past 7 days for a category
+function getRecentExpensesForCategory(categoryId) {
+  const transactions = getTransactions();
+  const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+  sevenDaysAgo.setHours(0, 0, 0, 0);
+  
+  const recentExpenses = transactions.filter(t => {
+    const transactionDate = new Date(t.date);
+    transactionDate.setHours(0, 0, 0, 0);
+    return t.type === 'expense' && 
+           t.category === categoryId && 
+           transactionDate >= sevenDaysAgo;
+  });
+  
+  return recentExpenses.reduce((sum, t) => sum + Math.abs(t.amount), 0);
+}
+
 document.getElementById('addBudgetBtn').addEventListener('click', () => {
   const categoryInput = document.getElementById('categoryInput');
   const amountInput = document.getElementById('amountInput');
@@ -33,7 +52,12 @@ document.getElementById('addBudgetBtn').addEventListener('click', () => {
   const amount = parseFloat(amountInput.value);
   if (category && !isNaN(amount) && amount >= 0) {
     saveCategoryBudget(category, amount);
-    saveRemainingBudget(category, amount);
+    
+    // Calculate remaining budget by accounting for expenses from past 7 days
+    const recentExpenses = getRecentExpensesForCategory(category);
+    const remainingBudget = amount - recentExpenses;
+    saveRemainingBudget(category, remainingBudget);
+    
     loadAndDisplayBudgets();
     categoryInput.value = '';
     amountInput.value = '';

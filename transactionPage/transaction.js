@@ -308,7 +308,7 @@ async function handleFormSubmit(e) {
     recurringAmount: formData.recurringAmount
   };
 // Save the transaction to local storage and provide feedback to the user
-  await addTransactionToStorage(transaction);
+  await addTransactionToStorage(transaction, formData.date);
   
   // For debt payments, redirect back to dashboard after showing success message
   if (formData.transactionType === 'debtPayment') {
@@ -333,7 +333,7 @@ function validateFormData(data) {
 }
 // The validateFormData function checks if the required fields in the form data are filled out correctly. It ensures that the transaction type and category are selected, the amount is a positive number, and a date is provided. If any of these conditions are not met, the function returns false, indicating that the form data is invalid and should not be processed further.
 
-function addTransactionToStorage(transaction) {
+function addTransactionToStorage(transaction, dateString) {
   // Just save the base transaction - recurring instances will be created dynamically based on current date
   addTransactionStorage(transaction);
   
@@ -341,8 +341,12 @@ function addTransactionToStorage(transaction) {
   if (transaction.type === 'income') {
     const existingDate = localStorage.getItem('beginningInputDate');
     if (!existingDate) {
-      const transactionDate = new Date(transaction.date).toLocaleDateString();
-      localStorage.setItem('beginningInputDate', transactionDate);
+      // Use the dateString parameter which is in YYYY-MM-DD format (local date)
+      // Parse it into a proper date format for display
+      const dateParts = dateString.split('-');
+      const date = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]);
+      const formattedDate = date.toLocaleDateString();
+      localStorage.setItem('beginningInputDate', formattedDate);
     }
   }
   
