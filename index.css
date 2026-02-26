@@ -19,9 +19,13 @@ h1 {
 .date {
   display: flex;
   justify-content: center;
-  color: var(--secondary-dark);
   text-align: center;
   margin-bottom: var(--spacing-2xl);
+}
+
+.date h2 {
+  color: var(--secondary-dark);
+  margin: 0;
 }
 
 .currency-selector {
