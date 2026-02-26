@@ -19,7 +19,7 @@ h1 {
 .date {
   display: flex;
   justify-content: center;
-  color: var(--text-secondary);
+  color: var(--secondary-dark);
   text-align: center;
   margin-bottom: var(--spacing-2xl);
 }
