@@ -337,17 +337,15 @@ function addTransactionToStorage(transaction, dateString) {
   // Just save the base transaction - recurring instances will be created dynamically based on current date
   addTransactionStorage(transaction);
   
-  // If this is the first income transaction, store the date
-  if (transaction.type === 'income') {
-    const existingDate = localStorage.getItem('beginningInputDate');
-    if (!existingDate) {
-      // Use the dateString parameter which is in YYYY-MM-DD format (local date)
-      // Parse it into a proper date format for display
-      const dateParts = dateString.split('-');
-      const date = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]);
-      const formattedDate = date.toLocaleDateString();
-      localStorage.setItem('beginningInputDate', formattedDate);
-    }
+  // Set or update the tracking start date to the first transaction's date
+  const existingDate = localStorage.getItem('beginningInputDate');
+  if (!existingDate) {
+    // Use the dateString parameter which is in YYYY-MM-DD format (local date)
+    // Parse it into a proper date format for display
+    const dateParts = dateString.split('-');
+    const date = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]);
+    const formattedDate = date.toLocaleDateString();
+    localStorage.setItem('beginningInputDate', formattedDate);
   }
   
   // Send to API in background without blocking UI (demonstrates axios logic)
