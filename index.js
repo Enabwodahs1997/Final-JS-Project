@@ -10,7 +10,6 @@ import { initializeChart, updateChart } from './chart.js';
 import { getSelectedCurrency, convertCurrency, formatCurrency } from './currency.js';
 import { setupCurrencySelectors } from './currencySelector.js';
 import { getTransactions, saveTransactions, processRecurringTransactions } from './storage.js';
-import { STORAGE_KEY } from './constants.js';
 document.addEventListener('DOMContentLoaded', async () => {
   await setupCurrencySelectors('currencySelect', loadAndDisplayData);
   await loadAndDisplayData();
