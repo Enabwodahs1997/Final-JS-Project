@@ -2,6 +2,7 @@ import { getSelectedCurrency, convertCurrency, formatCurrency } from '../currenc
 import { setupCurrencySelectors } from '../currencySelector.js';
 import { getTransactions, saveTransactions, clearTransactions, deleteTransaction, processRecurringTransactions } from '../storage.js';
 import { REMAINING_BUDGETS_KEY } from '../constants.js';
+import { categories } from '../transactionPage/objects.js';
 
 // Helper functions for budget management
 function getRemainingBudgets() {
@@ -33,6 +34,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   setupFilterListener();
   setupClearButton();
   setupDeleteListeners();
+  setupEditListeners();
+  setupEditModal();
 });
 
 //this is to load transactions and display them on the page.
@@ -105,6 +108,7 @@ async function createTransactionCard(transaction) {
       </div>
       <div class="transaction-right">
         <p class="transaction-amount ${amountClass}">${sign}${formattedAmount}</p>
+        <button class="btn-edit" data-id="${transaction.id}" title="Edit transaction">✏️</button>
         <button class="btn-delete" data-id="${transaction.id}" title="Delete transaction">×</button>
       </div>
     </div>
@@ -183,6 +187,139 @@ function setupDeleteListeners() {
       handleDeleteTransaction(btn.dataset.id); // Pass the transaction ID to the delete handler
     });
   });
+}
+
+// Set up edit button listeners
+function setupEditListeners() {
+  const editButtons = document.querySelectorAll('.btn-edit');
+  editButtons.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      handleEditTransaction(btn.dataset.id);
+    });
+  });
+}
+
+// Set up the edit modal
+function setupEditModal() {
+  const modal = document.getElementById('editModal');
+  const closeBtn = document.getElementById('closeEditModal');
+  const cancelBtn = document.getElementById('cancelEditBtn');
+  const saveBtn = document.getElementById('saveEditBtn');
+
+  closeBtn.addEventListener('click', () => closeEditModal());
+  cancelBtn.addEventListener('click', () => closeEditModal());
+  
+  // Close modal when clicking outside of it
+  window.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      closeEditModal();
+    }
+  });
+
+  saveBtn.addEventListener('click', () => saveEditedTransaction());
+}
+
+let currentEditingTransactionId = null;
+
+// Handle edit transaction
+function handleEditTransaction(transactionId) {
+  const transactions = getTransactions();
+  const transaction = transactions.find(t => t.id === parseInt(transactionId));
+  
+  if (!transaction) return;
+  
+  currentEditingTransactionId = parseInt(transactionId);
+  
+  // Populate category dropdown based on transaction type
+  const categorySelect = document.getElementById('editCategory');
+  const transactionCategories = categories[transaction.type] || [];
+  
+  categorySelect.innerHTML = '';
+  transactionCategories.forEach(cat => {
+    const option = document.createElement('option');
+    option.value = cat.id;
+    option.textContent = `${cat.icon} ${cat.name}`;
+    if (cat.id === transaction.category) {
+      option.selected = true;
+    }
+    categorySelect.appendChild(option);
+  });
+  
+  // Set the amount
+  document.getElementById('editAmount').value = Math.abs(transaction.amount);
+  
+  // Set the notes
+  document.getElementById('editNotes').value = transaction.notes || '';
+  
+  // Show the modal
+  document.getElementById('editModal').style.display = 'flex';
+}
+
+// Close the edit modal
+function closeEditModal() {
+  document.getElementById('editModal').style.display = 'none';
+  currentEditingTransactionId = null;
+}
+
+// Save edited transaction
+async function saveEditedTransaction() {
+  if (currentEditingTransactionId === null) return;
+  
+  const newCategory = document.getElementById('editCategory').value;
+  const newAmount = parseFloat(document.getElementById('editAmount').value);
+  const newNotes = document.getElementById('editNotes').value;
+  
+  if (!newCategory || isNaN(newAmount) || newAmount < 0) {
+    alert('Please enter valid category and amount');
+    return;
+  }
+  
+  const transactions = getTransactions();
+  const transactionIndex = transactions.findIndex(t => t.id === currentEditingTransactionId);
+  
+  if (transactionIndex === -1) return;
+  
+  const transaction = transactions[transactionIndex];
+  const oldAmount = transaction.amount;
+  const oldCategory = transaction.category;
+  
+  // Update the transaction
+  if (transaction.type === 'expense') {
+    // For expenses, preserve the negative sign
+    transaction.amount = -Math.abs(newAmount);
+  } else if (transaction.type === 'debt') {
+    // For debt, preserve the negative sign
+    transaction.amount = -Math.abs(newAmount);
+  } else {
+    // For income and debt payments, preserve positive
+    transaction.amount = Math.abs(newAmount);
+  }
+  
+  transaction.category = newCategory;
+  transaction.notes = newNotes;
+  
+  // Update budget tracking if this is an expense
+  if (transaction.type === 'expense') {
+    // Restore old amount to budget
+    restoreBudgetFromExpense(oldCategory, oldAmount);
+    
+    // Deduct new amount from budget
+    const remainingBudgets = getRemainingBudgets();
+    if (remainingBudgets[newCategory] !== undefined) {
+      const currentRemaining = remainingBudgets[newCategory];
+      const newRemaining = currentRemaining + oldAmount - newAmount; // Restore old, then deduct new
+      saveRemainingBudget(newCategory, newRemaining);
+    }
+  }
+  
+  // Save updated transactions
+  saveTransactions(transactions);
+  
+  closeEditModal();
+  await loadAndDisplayTransactions();
+  setupDeleteListeners();
+  setupEditListeners();
 }
 
 export { getTransactions };
