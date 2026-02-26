@@ -336,6 +336,15 @@ function addTransactionToStorage(transaction) {
   // Just save the base transaction - recurring instances will be created dynamically based on current date
   addTransactionStorage(transaction);
   
+  // If this is the first income transaction, store the date
+  if (transaction.type === 'income') {
+    const existingDate = localStorage.getItem('beginningInputDate');
+    if (!existingDate) {
+      const transactionDate = new Date(transaction.date).toLocaleDateString();
+      localStorage.setItem('beginningInputDate', transactionDate);
+    }
+  }
+  
   // Send to API in background without blocking UI (demonstrates axios logic)
   axios.post(API_URL, transaction).catch(() => {
     console.log('API unavailable, transaction saved to localStorage');

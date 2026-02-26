@@ -15,7 +15,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   await setupCurrencySelectors('currencySelect', loadAndDisplayData);
   await loadAndDisplayData();
   setupEventListeners();
+  
+  // Display the date tracking started (first income entry date)
+  const storedDate = localStorage.getItem('beginningInputDate');
+  if (storedDate) {
+    document.getElementById('beginningInputDate').textContent = `Date Tracking Started: ${storedDate}`;
+  }
 });
+
 async function loadAndDisplayData() {
   // Process recurring transactions to create new instances if due
   processRecurringTransactions();

@@ -143,6 +143,9 @@ async function handleClearHistory() {
       }
     });
     
+    // Clear the tracking start date
+    localStorage.removeItem('beginningInputDate');
+    
     clearTransactions();
     await loadAndDisplayTransactions();
   }
