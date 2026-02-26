@@ -265,16 +265,7 @@ async function handleFormSubmit(e) {
     alert('Please fill in all required fields');
     return;
   }
-// Save budget limit for this category if provided
-  if (formData.budget > 0) {
-    saveCategoryBudget(formData.category, formData.budget);
-    
-    // Initialize remaining budget if not already set
-    const remainingBudgets = getRemainingBudgets();
-    if (remainingBudgets[formData.category] === undefined) {
-      saveRemainingBudget(formData.category, formData.budget);
-    }
-  }
+
   
   // Deduct from remaining budget if this is an expense
   if (formData.transactionType === 'expense') {
