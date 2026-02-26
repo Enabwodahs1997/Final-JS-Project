@@ -27,10 +27,15 @@ function setupBudgetRefresh() {
       const selectedCategory = categorySelect.value;
       if (selectedCategory) {
         const budgetInput = document.getElementById('budget');
-        const remainingBudget = getRemainingBudget(selectedCategory);
+        const budgets = getCategoryBudgets();
         
-        // Update the budget field with the remaining budget
-        budgetInput.value = remainingBudget;
+        // Only show budget if it was explicitly set
+        if (budgets[selectedCategory] !== undefined) {
+          const remainingBudget = getRemainingBudget(selectedCategory);
+          budgetInput.value = remainingBudget;
+        } else {
+          budgetInput.value = '';
+        }
       }
     }
   });
@@ -221,10 +226,15 @@ function setupCategoryBudgetAutoFill() {
   categorySelect.addEventListener('change', () => {
     const selectedCategory = categorySelect.value;
     if (selectedCategory) {
-      const remainingBudget = getRemainingBudget(selectedCategory);
+      const budgets = getCategoryBudgets();
       
-      // Show the remaining budget in the budget field
-      budgetInput.value = remainingBudget;
+      // Only show budget if it was explicitly set
+      if (budgets[selectedCategory] !== undefined) {
+        const remainingBudget = getRemainingBudget(selectedCategory);
+        budgetInput.value = remainingBudget;
+      } else {
+        budgetInput.value = '';
+      }
     } else {
       budgetInput.value = '';
     }
