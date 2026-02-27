@@ -6,7 +6,6 @@
 // and updating the financial overview. Event listeners are set up to respond to user interactions, 
 // making the application interactive and user-friendly.
 
-import { SpeedInsights } from "@vercel/speed-insights/next";
 import { initializeChart, updateChart } from './chart.js';
 import { getSelectedCurrency, convertCurrency, formatCurrency } from './currency.js';
 import { setupCurrencySelectors } from './currencySelector.js';
