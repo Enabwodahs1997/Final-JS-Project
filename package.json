@@ -7,10 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "cap:sync": "npm run build && npx cap sync",
-    "cap:open:android": "npx cap open android",
-    "cap:run:android": "npm run cap:sync && npx cap run android"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
@@ -25,9 +22,6 @@
   },
   "homepage": "https://github.com/Enabwodahs1997/Final-JS-Project#readme",
   "dependencies": {
-    "@capacitor/android": "^8.1.0",
-    "@capacitor/cli": "^8.1.0",
-    "@capacitor/core": "^8.1.0",
     "@vercel/speed-insights": "^1.3.1",
     "axios": "^1.6.0",
     "chart.js": "^4.5.1"
