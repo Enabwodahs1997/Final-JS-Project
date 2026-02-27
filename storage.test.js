@@ -7,7 +7,7 @@ import { addTransaction, getTransactions, clearTransactions } from './storage.js
 
 // STEP 1: describe() - Creates a test suite (a group of related tests)
 // All tests below are grouped under 'addTransaction' for organization
-describe('addTransaction', () => {
+describe('addTransaction', () => { //describe() defines a test suite named 'addTransaction'. This groups all related tests together, making it easier to understand what functionality is being tested.
   
   // STEP 2: beforeEach() - Runs before EACH test to set up a fresh state
   // WHY: We need a clean localStorage mock for every test so tests don't affect each other
@@ -41,7 +41,7 @@ describe('addTransaction', () => {
 
   // STEP 3: it() - Defines a single test
   // 'should add a transaction and return it' describes what we're testing
-  it('should add a transaction and return it', () => {
+  it('should add a transaction and return it', () => {  //it() defines a test case. The first argument is a string describing the test, and the second argument is a function that contains the test code.
     // Step 3a: ARRANGE - Set up test data
     const transaction = {
       id: 1,
@@ -61,7 +61,7 @@ describe('addTransaction', () => {
   // STEP 4: it() - Second test - verifies data actually gets saved
   // WHY: We need to verify not just that the function returns a value,
   // but that the transaction was actually persisted to storage
-  it('should persist transaction to storage', () => {
+  it('should persist transaction to storage', () => { //it() defines another test case to check if the transaction is saved in localStorage.
     // Step 4a: ARRANGE - Create a transaction
     const transaction = { id: 1, amount: 100, type: 'income' };
     
