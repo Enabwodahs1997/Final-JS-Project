@@ -60,7 +60,10 @@ export function initializeChart(transactions) { //pulls the transactions data fr
 }
 
 // Prepare data for the chart by categorizing transactions
-function prepareChartData(transactions) {
+
+//this is the function that has the test on storage.test.js to make sure the data is being categorized correctly 
+// for the chart to use
+export function prepareChartData(transactions) {
   const categories = {};
 
   transactions.forEach((transaction) => {

@@ -1,87 +1,65 @@
-// NOTE: This test file was added by AI to demonstrate unit testing.
-// Unit tests verify individual functions work correctly in isolation.
-// This file tests the storage.js module's addTransaction function.
+import { describe, it, expect } from 'vitest';
+import { prepareChartData } from './chart.js';
 
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { addTransaction, getTransactions, clearTransactions } from './storage.js';
+describe('chart rules', () => {
+    it('should prepare chart data correctly', () => {
+        const transactions = [
+            { amount: 50, category: 'Food', type: 'expense' },
+            { amount: 30, category: 'Transport', type: 'expense' },
+            { amount: 20, category: 'Entertainment', type: 'expense' },
+            { amount: 100, category: 'Food', type: 'expense' },
+        ];
+        
+        const result = prepareChartData(transactions);
+        
+        expect(result.labels).toContain('Food');
+        expect(result.labels).toContain('Transport');
+        expect(result.labels).toContain('Entertainment');
+        
+        const foodIndex = result.labels.indexOf('Food');
+        const transportIndex = result.labels.indexOf('Transport');
+        const entertainmentIndex = result.labels.indexOf('Entertainment');
+        
+        expect(result.data[foodIndex]).toBe(150);
+        expect(result.data[transportIndex]).toBe(30);
+        expect(result.data[entertainmentIndex]).toBe(20);
+        expect(result.total).toBe(200);
+    });
 
-// STEP 1: describe() - Creates a test suite (a group of related tests)
-// All tests below are grouped under 'addTransaction' for organization
-describe('addTransaction', () => { //describe() defines a test suite named 'addTransaction'. This groups all related tests together, making it easier to understand what functionality is being tested.
-  
-  // STEP 2: beforeEach() - Runs before EACH test to set up a fresh state
-  // WHY: We need a clean localStorage mock for every test so tests don't affect each other
-  beforeEach(() => {
-    // Creates a fake localStorage object (the real one requires a browser)
-    // This allows tests to run in Node.js without a browser environment
-    global.localStorage = {
-      data: {}, // Internal storage to hold data
-      
-      // getItem(key) - Retrieves a value from storage
-      getItem(key) { 
-        return this.data[key] || null; 
-      },
-      
-      // setItem(key, value) - Stores a value
-      setItem(key, value) { 
-        this.data[key] = value; //makes an array of key value pairs to store the data in local storage.
-      },
-      
-      // removeItem(key) - Deletes a value
-      removeItem(key) { 
-        delete this.data[key]; // Removes the key array from storage
-      },
-      
-      // clear() - Deletes everything
-      clear() { 
-        this.data = {}; 
-      }
-    };
-  });
+    it('should handle empty transactions', () => {
+        const transactions = [];
+        const result = prepareChartData(transactions);
+        
+        expect(result.labels).toEqual([]);
+        expect(result.data).toEqual([]);
+        expect(result.total).toBe(0);
+    });
 
-  // STEP 3: it() - Defines a single test
-  // 'should add a transaction and return it' describes what we're testing
-  it('should add a transaction and return it', () => {  //it() defines a test case. The first argument is a string describing the test, and the second argument is a function that contains the test code.
-    // Step 3a: ARRANGE - Set up test data
-    const transaction = {
-      id: 1,
-      amount: 50,
-      category: 'Food',
-      type: 'expense'
-    };
-    
-    // Step 3b: ACT - Call the function we're testing
-    const result = addTransaction(transaction);
-    
-    // Step 3c: ASSERT - Verify the result is what we expected
-    // expect(result).toEqual(transaction) checks if the returned transaction matches our input
-    expect(result).toEqual(transaction);
-  });
+    it('should categorize income transactions', () => {
+        const transactions = [
+            { amount: 1000, category: 'Salary', type: 'income' },
+            { amount: 50, category: 'Food', type: 'expense' },
+        ];
+        
+        const result = prepareChartData(transactions);
+        
+        expect(result.labels).toContain('Income');
+        expect(result.labels).toContain('Food');
+        
+        const incomeIndex = result.labels.indexOf('Income');
+        expect(result.data[incomeIndex]).toBe(1000);
+    });
 
-  // STEP 4: it() - Second test - verifies data actually gets saved
-  // WHY: We need to verify not just that the function returns a value,
-  // but that the transaction was actually persisted to storage
-  it('should persist transaction to storage', () => { //it() defines another test case to check if the transaction is saved in localStorage.
-    // Step 4a: ARRANGE - Create a transaction
-    const transaction = { id: 1, amount: 100, type: 'income' };
-    
-    // Step 4b: ACT - Add it to storage
-    addTransaction(transaction);
-    
-    // Step 4c: ASSERT - Retrieve it and verify it exists
-    const stored = getTransactions();
-    
-    // Verify the array has 1 item
-    expect(stored).toHaveLength(1);
-    
-    // Verify the item matches what we added
-    expect(stored[0]).toEqual(transaction);
-  });
-
-  // OPTIONAL: afterEach() - Cleanup after each test
-  // WHY: Ensures localStorage is empty before the next test runs
-  // This prevents test #2 from affecting test #3
-  afterEach(() => {
-    global.localStorage.clear();
-  });
+    it('should categorize debt transactions', () => {
+        const transactions = [
+            { amount: 500, category: 'Credit Card', type: 'debt' },
+        ];
+        
+        const result = prepareChartData(transactions);
+        
+        expect(result.labels).toContain('Debt - Credit Card');
+        const debtIndex = result.labels.indexOf('Debt - Credit Card');
+        expect(result.data[debtIndex]).toBe(500);
+        expect(result.colors[debtIndex]).toBe('#8B0000'); // Dark red for debt
+    });
 });
