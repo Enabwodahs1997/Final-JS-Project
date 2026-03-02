@@ -513,3 +513,11 @@
     color: var(--neutral-400);
   }
 }
+
+.history-note {
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  margin: var(--spacing-lg) 0;
+  color: var(--secondary-dark);
+}
