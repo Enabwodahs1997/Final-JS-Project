@@ -146,7 +146,7 @@ function handleViewHistory() {
 function handleBudgetManagement() {
   window.location.href = './budgetPage/budget.html';
 }
-
+//these add the ability to click the buttons and go to the different pages. One for each page is needed.
 
 // The handleViewHistory function is called when the user clicks the "View History" button. It redirects the user to the transaction history page where they can see a list of all their logged transactions. Similar to handleAddTransaction, it uses window.location.href to navigate to the specified page.
 export { addTransaction, getTransactions, calculateTotals };
