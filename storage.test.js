@@ -62,4 +62,5 @@ describe('chart rules', () => {
         expect(result.data[debtIndex]).toBe(500);
         expect(result.colors[debtIndex]).toBe('#8B0000'); // Dark red for debt
     });
-});
+}); //I forgot to add in my commit message that this tests the debt to be sure it passes the correct color for the chart 
+// as well as categorizes it correctly
