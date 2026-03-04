@@ -64,3 +64,8 @@ describe('chart rules', () => {
     });
 }); //I forgot to add in my commit message that this tests the debt to be sure it passes the correct color for the chart 
 // as well as categorizes it correctly
+
+// should prepare chart data correctly
+// should handle empty transactions
+// should categorize income transactions
+// should categorize debt transactions
