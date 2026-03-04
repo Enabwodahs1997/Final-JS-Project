@@ -96,7 +96,7 @@ export function prepareChartData(transactions) {
     '#36A2EB', // Blue
     '#FFCE56', // Yellow
     '#228B22', // Forest Green
-    '#FF9F40', // Orange
+    '#FF9F40', // Oranged
     '#00BCD4', // Cyan
   ];
 
